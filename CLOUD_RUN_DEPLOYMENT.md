@@ -49,7 +49,7 @@ Add the following roles to the service account:
 
 1. **Cloud Run Admin** (`roles/run.admin`) - To deploy services
 2. **Service Account User** (`roles/iam.serviceAccountUser`) - To use service accounts
-3. **Storage Admin** (`roles/storage.admin`) - To push Docker images to Container Registry
+3. **Artifact Registry Writer** (`roles/artifactregistry.writer`) - To push Docker images to Artifact Registry
 
 You can add roles via the UI or command line:
 
@@ -65,7 +65,16 @@ gcloud projects add-iam-policy-binding PROJECT_ID \
 
 gcloud projects add-iam-policy-binding PROJECT_ID \
   --member="serviceAccount:SERVICE_ACCOUNT_EMAIL" \
-  --role="roles/storage.admin"
+  --role="roles/artifactregistry.writer"
+```
+
+**Note:** The workflow will automatically create the Artifact Registry repository if it doesn't exist, but you can also create it manually:
+
+```bash
+gcloud artifacts repositories create adventgames \
+  --repository-format=docker \
+  --location=europe-west1 \
+  --description="Docker repository for Advent Games"
 ```
 
 ### 1.5 Create and Download Service Account Key
