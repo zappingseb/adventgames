@@ -68,14 +68,16 @@ gcloud projects add-iam-policy-binding PROJECT_ID \
   --role="roles/artifactregistry.writer"
 ```
 
-**Note:** The workflow will automatically create the Artifact Registry repository if it doesn't exist, but you can also create it manually:
+**Note:** Make sure your Artifact Registry repository exists before running the workflow. You can create it manually if needed:
 
 ```bash
-gcloud artifacts repositories create adventgames \
+gcloud artifacts repositories create adventgamesregistry \
   --repository-format=docker \
   --location=europe-west1 \
   --description="Docker repository for Advent Games"
 ```
+
+Then add the repository name (`adventgamesregistry`) as the `GCP_ARTIFACT_REGISTRY` secret in GitHub (see Step 2).
 
 ### 1.5 Create and Download Service Account Key
 
@@ -104,6 +106,12 @@ Add the following secrets:
   - Open the JSON file in a text editor
   - Copy the entire contents (including `{` and `}`)
   - Paste into the secret value
+
+### `GCP_ARTIFACT_REGISTRY`
+- **Name**: `GCP_ARTIFACT_REGISTRY`
+- **Value**: The name of your existing Artifact Registry repository (e.g., `adventgamesregistry`)
+  - This should match the repository name you created in Google Cloud Console
+  - Go to **Artifact Registry** > **Repositories** to find the name
 
 ## Step 3: Configure GitHub Actions Workflow
 
