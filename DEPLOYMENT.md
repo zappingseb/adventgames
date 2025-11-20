@@ -1,5 +1,16 @@
 # Deployment Guide for Advent Games
 
+This guide explains how to deploy Advent Games to production.
+
+## Deployment Options
+
+- **[Google Cloud Run](./CLOUD_RUN_DEPLOYMENT.md)** - Serverless deployment with automatic scaling (Recommended)
+- **Docker Compose + SWAG** - Self-hosted with Let's Encrypt (see below)
+
+---
+
+## Docker Compose + SWAG Deployment
+
 This guide explains how to deploy Advent Games to production using Docker Compose and SWAG (Let's Encrypt).
 
 ## Prerequisites
