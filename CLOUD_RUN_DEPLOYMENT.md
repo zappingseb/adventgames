@@ -24,14 +24,14 @@ This guide walks you through deploying Advent Games to Google Cloud Run using Gi
 1. In the Cloud Console, go to **APIs & Services** > **Library**
 2. Enable the following APIs:
    - **Cloud Run API**
-   - **Container Registry API** (or **Artifact Registry API**)
+   - **Artifact Registry API**
    - **Cloud Build API** (if using Cloud Build)
 
 You can also enable them via command line:
 
 ```bash
 gcloud services enable run.googleapis.com
-gcloud services enable containerregistry.googleapis.com
+gcloud services enable artifactregistry.googleapis.com
 gcloud services enable cloudbuild.googleapis.com
 ```
 
