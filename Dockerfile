@@ -18,6 +18,7 @@ RUN npm ci --no-audit --no-fund
 COPY src ./src
 COPY index.html ./
 COPY public ./public
+COPY server.js ./
 
 # Build the React app
 RUN npm run build
