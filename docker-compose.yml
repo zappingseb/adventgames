@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  swag:
+    image: linuxserver/swag:latest
+    container_name: adventgames-swag
+    cap_add:
+      - NET_ADMIN
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - URL=keepoala.com
+      - SUBDOMAINS=adventgames
+      - ONLY_SUBDOMAINS=true
+      - VALIDATION=http
+      - EMAIL=sebastian@keepoala.com
+    volumes:
+      - ./swag/config:/config
+    networks:
+      - adventgames-network
+    depends_on:
+      - app
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: adventgames-app
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    volumes:
+      # Persist data files (default files from repo are copied to /app/data in image)
+      - ./data:/app/data
+    networks:
+      - adventgames-network
+    # Don't expose ports directly - only through swag
+    expose:
+      - "3000"
+
+networks:
+  adventgames-network:
+    driver: bridge
+

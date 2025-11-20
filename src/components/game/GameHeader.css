@@ -1,0 +1,70 @@
+.game-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 10;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.score-display {
+    color: white;
+    font-size: 1.2rem;
+    font-weight: bold;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.level-display {
+    font-size: 1rem;
+    opacity: 0.9;
+}
+
+.death-count {
+    font-size: 1rem;
+    opacity: 0.9;
+}
+
+.death-count.flicker {
+    animation: flicker 200ms;
+}
+
+@keyframes flicker {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    25% {
+        opacity: 0.3;
+        transform: scale(1.2);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(0.9);
+    }
+    75% {
+        opacity: 0.5;
+        transform: scale(1.1);
+    }
+}
+
+.back-btn {
+    color: white;
+    text-decoration: none;
+    font-size: 1rem;
+    padding: 8px 15px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+}
+
+@media (max-width: 480px) {
+    .score-display {
+        font-size: 1rem;
+    }
+}
+

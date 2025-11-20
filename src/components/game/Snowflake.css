@@ -1,0 +1,28 @@
+.snowflake {
+    position: absolute;
+    font-size: 30px;
+    user-select: none;
+    pointer-events: auto;
+    cursor: pointer;
+    transition: none;
+    z-index: 5;
+    /* Make hit area 9x bigger (3x in each direction) */
+    padding: 45px;
+    margin: -45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.flake-icon {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+    pointer-events: none;
+}
+
+.snowflake.ground {
+    opacity: 0.5;
+    pointer-events: none;
+}
+

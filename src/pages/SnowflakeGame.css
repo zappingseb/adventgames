@@ -1,0 +1,8 @@
+.game-container {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(180deg, #1e3c72 0%, #2a5298 50%, #87CEEB 100%);
+}
+

@@ -1,0 +1,60 @@
+.leaderboard {
+    margin: 25px 0;
+    padding-top: 20px;
+    border-top: 2px solid #eee;
+}
+
+.leaderboard h3 {
+    color: #667eea;
+    margin-bottom: 15px;
+    font-size: 1.3rem;
+}
+
+.leaderboard-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    text-align: left;
+}
+
+.leaderboard-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 15px;
+    margin-bottom: 8px;
+    background: #f5f5f5;
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+.leaderboard-item .rank {
+    font-weight: bold;
+    color: #667eea;
+    min-width: 30px;
+}
+
+.leaderboard-item .username {
+    flex: 1;
+    text-align: left;
+    margin-left: 10px;
+    color: #333;
+}
+
+.leaderboard-item .score {
+    font-weight: bold;
+    color: #667eea;
+}
+
+.loading,
+.no-scores,
+.error {
+    color: #999;
+    font-style: italic;
+    padding: 20px;
+}
+
+.error {
+    color: #e74c3c;
+}
+

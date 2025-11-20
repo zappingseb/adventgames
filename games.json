@@ -1,0 +1,20 @@
+{
+  "games": [
+    {
+      "code": "SNOWFLAKE2024",
+      "name": "snowflake",
+      "title": "❄️ Snowflake Tapper",
+      "description": "Tap snowflakes before they hit the ground!",
+      "path": "/snowflake",
+      "activated": true
+    },
+    {
+      "code": "SNOWFLAKE2024TEST",
+      "name": "snowflake-test",
+      "title": "❄️ Snowflake Tapper (Test)",
+      "description": "Tap snowflakes before they hit the ground!",
+      "path": "/snowflake",
+      "activated": true
+    }
+  ]
+}

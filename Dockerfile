@@ -1,0 +1,68 @@
+# Multi-stage build for Advent Games - Optimized for size
+
+# Stage 1: Build the React app
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Copy package files first for better layer caching
+COPY package*.json ./
+COPY tsconfig*.json ./
+COPY vite.config.ts ./
+
+# Install all dependencies (including dev dependencies for build)
+# Use --no-audit and --no-fund to reduce output and speed up
+RUN npm ci --no-audit --no-fund
+
+# Copy source files
+COPY src ./src
+COPY index.html ./
+COPY public ./public
+
+# Build the React app
+RUN npm run build
+
+# Stage 2: Production runtime - minimal image
+FROM node:20-alpine
+
+# Install dumb-init for proper signal handling in Cloud Run
+RUN apk add --no-cache dumb-init
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install only production dependencies and clean npm cache
+RUN npm ci --only=production --no-audit --no-fund && \
+    npm cache clean --force && \
+    rm -rf /tmp/*
+
+# Copy built files from builder
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/server.js ./
+COPY --from=builder /app/public ./public
+
+# Copy default data files to data directory
+COPY scores.json ./data/scores.json
+COPY games.json ./data/games.json
+
+# Create non-root user for security
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nodejs -u 1001 && \
+    chown -R nodejs:nodejs /app
+
+USER nodejs
+
+# Expose port (Cloud Run uses PORT env var, but we keep this for compatibility)
+EXPOSE 3000
+
+# Set environment to production
+ENV NODE_ENV=production
+
+# Use dumb-init to handle signals properly
+ENTRYPOINT ["dumb-init", "--"]
+
+# Start the server
+CMD ["node", "server.js"]
+

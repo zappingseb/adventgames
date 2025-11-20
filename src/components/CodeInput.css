@@ -1,0 +1,60 @@
+.code-input-form {
+    width: 100%;
+    max-width: 400px;
+    margin-bottom: 30px;
+}
+
+.code-input-form input {
+    width: 100%;
+    padding: 15px;
+    font-size: 1.1rem;
+    border: none;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    text-align: center;
+    outline: none;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.code-input-form input:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.code-input-form button {
+    width: 100%;
+    padding: 15px;
+    font-size: 1.1rem;
+    background: white;
+    color: #667eea;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.code-input-form button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.code-input-form button:active:not(:disabled) {
+    transform: scale(0.95);
+}
+
+.error-message {
+    color: #e74c3c;
+    font-size: 0.9rem;
+    margin-top: 10px;
+    text-align: center;
+}
+
+.success-message {
+    color: #27ae60;
+    font-size: 0.9rem;
+    margin-top: 10px;
+    text-align: center;
+}
+
