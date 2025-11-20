@@ -6,7 +6,7 @@
       "title": "❄️ Snowflake Tapper",
       "description": "Tap snowflakes before they hit the ground!",
       "path": "/snowflake",
-      "activated": true
+      "activated": false
     },
     {
       "code": "SNOWFLAKE2024TEST",
@@ -14,7 +14,7 @@
       "title": "❄️ Snowflake Tapper (Test)",
       "description": "Tap snowflakes before they hit the ground!",
       "path": "/snowflake",
-      "activated": true
+      "activated": false
     }
   ]
 }
