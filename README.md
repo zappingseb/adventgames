@@ -42,3 +42,14 @@ npm start
 - Express (backend API)
 - File-based storage (scores.json)
 
+## Deployment
+
+See the [Deployment Guide](./DEPLOYMENT.md) for instructions on deploying to:
+- **Google Cloud Run** (Recommended) - Serverless with automatic scaling
+- **Docker Compose + SWAG** - Self-hosted with Let's Encrypt
+
+The repository includes:
+- Optimized Dockerfile for small image size
+- GitHub Actions workflow for CI/CD to Cloud Run
+- Comprehensive deployment documentation
+
