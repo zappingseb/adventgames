@@ -48,7 +48,7 @@ async function initScores() {
     }
     await fs.access(SCORES_FILE);
   } catch {
-    await fs.writeFile(SCORES_FILE, JSON.stringify({ snowflake: [] }, null, 2));
+    await fs.writeFile(SCORES_FILE, JSON.stringify({ snowflake: [], flappybird: [] }, null, 2));
   }
 }
 

@@ -15,6 +15,14 @@
       "description": "Tap snowflakes before they hit the ground!",
       "path": "/snowflake",
       "activated": false
+    },
+    {
+      "code": "FLAPPYBIRD2024",
+      "name": "flappybird",
+      "title": "🐦 Family Flappy Bird",
+      "description": "Choose your character and fly through obstacles!",
+      "path": "/flappybird",
+      "activated": false
     }
   ]
 }
