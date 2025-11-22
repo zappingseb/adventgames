@@ -270,13 +270,6 @@ async function loadGames() {
         games = [];
       }
     }
-    
-    // In production, strip any activated fields from games.json
-    // Activation is controlled only via Cloud Run environment variables
-    games = games.map(game => {
-      const { activated, ...gameWithoutActivated } = game;
-      return gameWithoutActivated;
-    });
   }
   
   // Merge activated states from environment variables

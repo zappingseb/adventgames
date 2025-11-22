@@ -42,16 +42,9 @@ jobs:
         run: |
           echo "${{ secrets.GCP_STORAGE_ADMIN_KEY }}" > gcloud-storage-admin-key.json
 
-      - name: Write games.json from secret (strip activated field)
+      - name: Write games.json from secret
         run: |
-          echo "${{ secrets.GAMES_CONFIG }}" | node -e "
-            const data = JSON.parse(require('fs').readFileSync(0, 'utf-8'));
-            data.games = data.games.map(game => {
-              const { activated, ...gameWithoutActivated } = game;
-              return gameWithoutActivated;
-            });
-            require('fs').writeFileSync('games.json', JSON.stringify(data, null, 2));
-          "
+          echo "${{ secrets.GAMES_CONFIG }}" > games.json
 
       - name: Build Docker image
         run: |
