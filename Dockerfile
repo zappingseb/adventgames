@@ -44,14 +44,19 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/server.js ./
 COPY --from=builder /app/public ./public
 
-# Copy default data files to data directory
-COPY scores.json ./data/scores.json
-COPY games.json ./data/games.json
+# Copy service account key file (created in GitHub Actions from secret)
+COPY gcloud-storage-admin-key.json ./gcloud-storage-admin-key.json
+
+# Note: games.json and scores.json are no longer copied here
+# - games.json comes from GAMES_CONFIG environment variable (GitHub Secrets)
+# - scores.json is stored in Cloud Storage (persistent across redeployments)
 
 # Create non-root user for security
 RUN addgroup -g 1001 -S nodejs && \
     adduser -S nodejs -u 1001 && \
-    chown -R nodejs:nodejs /app
+    chown -R nodejs:nodejs /app && \
+    chmod 600 /app/gcloud-storage-admin-key.json && \
+    chown nodejs:nodejs /app/gcloud-storage-admin-key.json
 
 USER nodejs
 

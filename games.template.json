@@ -1,0 +1,19 @@
+{
+  "games": [
+    {
+      "code": "SNOWFLAKE2024",
+      "name": "snowflake",
+      "title": "❄️ Snowflake Tapper",
+      "description": "Tap snowflakes before they hit the ground!",
+      "path": "/snowflake"
+    },
+    {
+      "code": "FLAPPYBIRD2024",
+      "name": "flappybird",
+      "title": "🐦 Family Flappy Bird",
+      "description": "Choose your character and fly through obstacles!",
+      "path": "/flappybird"
+    }
+  ]
+}
+

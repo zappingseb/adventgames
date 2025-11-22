@@ -10,3 +10,4 @@ yarn-error.log*
 .idea
 data/
 swag/
+gcloud-storage-admin-key.json

@@ -38,6 +38,10 @@ jobs:
         run: |
           gcloud auth configure-docker europe-west1-docker.pkg.dev --quiet
 
+      - name: Write service account key file
+        run: |
+          echo "${{ secrets.GCP_STORAGE_ADMIN_KEY }}" > gcloud-storage-admin-key.json
+
       - name: Build Docker image
         run: |
           docker build -t $IMAGE_NAME:$GITHUB_SHA -t $IMAGE_NAME:latest .
@@ -60,7 +64,9 @@ jobs:
             --max-instances 2 \
             --timeout 300 \
             --port 3000 \
-            --set-env-vars NODE_ENV=production
+            --set-env-vars NODE_ENV=production,GAMES_CONFIG="${{ secrets.GAMES_CONFIG }}" \
+            --set-env-vars GCP_PROJECT=${{ secrets.GCP_PROJECT_ID }} \
+            --set-env-vars SCORES_BUCKET_NAME=${{ secrets.SCORES_BUCKET_NAME || 'adventgames-scores' }}
 
       - name: Get service URL
         run: |

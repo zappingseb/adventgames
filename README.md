@@ -48,8 +48,14 @@ See the [Deployment Guide](./DEPLOYMENT.md) for instructions on deploying to:
 - **Google Cloud Run** (Recommended) - Serverless with automatic scaling
 - **Docker Compose + SWAG** - Self-hosted with Let's Encrypt
 
+**Important:** For Cloud Run deployment, see [CONFIGURATION.md](./CONFIGURATION.md) for:
+- Setting up Cloud Storage for persistent scores
+- Configuring games via GitHub Secrets
+- Managing game activation via Cloud Run environment variables
+
 The repository includes:
 - Optimized Dockerfile for small image size
 - GitHub Actions workflow for CI/CD to Cloud Run
 - Comprehensive deployment documentation
+- Cloud Storage integration for persistent scores
 
