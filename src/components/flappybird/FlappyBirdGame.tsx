@@ -1,64 +1,111 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { Character, GRAVITY, JUMP_STRENGTH, OBSTACLE_GAP, OBSTACLE_SPACING, SPEED_INCREASE_INTERVAL, SPEED_INCREASE_RATE } from '../../constants/flappyBirdConstants';
+import { Character, GRAVITY, JUMP_STRENGTH, OBSTACLE_GAP, OBSTACLE_SPACING, SPEED_INCREASE_INTERVAL, SPEED_INCREASE_RATE, DEATH_BARRIERS, OBSTACLE_SPEED } from '../../constants/flappyBirdConstants';
+import { drawObstacle, Obstacle } from './FlappyBirdObstacle';
 import './FlappyBirdGame.css';
-
-interface Obstacle {
-  id: number;
-  x: number;
-  topHeight: number;
-  bottomY: number;
-  passed: boolean;
-}
 
 interface FlappyBirdGameProps {
   character: Character;
   gameActive: boolean;
   onScoreChange: (score: number) => void;
   onGameOver: () => void;
+  onBarrierHit: (count: number) => void;
 }
 
-function FlappyBirdGame({ character, gameActive, onScoreChange, onGameOver }: FlappyBirdGameProps) {
+function FlappyBirdGame({ character, gameActive, onScoreChange, onGameOver, onBarrierHit }: FlappyBirdGameProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationFrameRef = useRef<number | null>(null);
   const lastTimeRef = useRef<number>(0);
-  const lastScoreTimeRef = useRef<number>(0);
   const lastSpeedIncreaseRef = useRef<number>(0);
-  const gameSpeedRef = useRef<number>(3);
+  const gameSpeedRef = useRef<number>(OBSTACLE_SPEED);
+  const birdVelocityRef = useRef<number>(0);
+  const birdYRef = useRef<number>(250);
   
-  const [birdY, setBirdY] = useState<number>(250);
-  const [birdVelocity, setBirdVelocity] = useState<number>(0);
   const [obstacles, setObstacles] = useState<Obstacle[]>([]);
-  const [score, setScore] = useState<number>(0);
+  const [barrierHits, setBarrierHits] = useState<number>(0);
+  const [scoreHits, setScoreHits] = useState<number[]>([]);
+  const collisionProcessedRef = useRef<Set<number>>(new Set());
+  const hitIdsRef = useRef<Set<number>>(new Set());
+  const [blinkVisible, setBlinkVisible] = useState<boolean>(true);
+  const [hasHitObstacles, setHasHitObstacles] = useState<boolean>(false);
 
-  const CANVAS_WIDTH = 400;
-  const CANVAS_HEIGHT = 600;
+  const [canvasSize, setCanvasSize] = useState({ width: window.innerWidth, height: window.innerHeight - 100 });
+  
+  useEffect(() => {
+    const handleResize = () => {
+      setCanvasSize({ width: window.innerWidth, height: window.innerHeight - 100 });
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  
+  const CANVAS_WIDTH = canvasSize.width;
+  const CANVAS_HEIGHT = canvasSize.height;
   const BIRD_SIZE = 40;
   const OBSTACLE_WIDTH = 60;
 
   // Handle tap/click to jump
-  const handleJump = useCallback(() => {
+  const handleJump = useCallback((e: React.PointerEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+    // Try to preventDefault, but don't fail if event is passive (touch events)
+    try {
+      e.preventDefault();
+    } catch (err) {
+      // Ignore errors from passive event listeners
+    }
+    e.stopPropagation();
     if (gameActive) {
-      setBirdVelocity(JUMP_STRENGTH);
+      birdVelocityRef.current = JUMP_STRENGTH;
     }
   }, [gameActive]);
 
-  // Initialize obstacles
+  // Initialize obstacles when game becomes active
   useEffect(() => {
-    if (gameActive && obstacles.length === 0) {
-      const initialObstacles: Obstacle[] = [];
-      for (let i = 0; i < 3; i++) {
-        const topHeight = Math.random() * (CANVAS_HEIGHT - OBSTACLE_GAP - 100) + 50;
-        initialObstacles.push({
-          id: i,
-          x: CANVAS_WIDTH + i * OBSTACLE_SPACING,
-          topHeight,
-          bottomY: topHeight + OBSTACLE_GAP,
-          passed: false,
-        });
+    if (gameActive) {
+      if (obstacles.length === 0) {
+        const initialObstacles: Obstacle[] = [];
+        for (let i = 0; i < 3; i++) {
+          const topHeight = Math.random() * (CANVAS_HEIGHT - OBSTACLE_GAP - 100) + 50;
+          initialObstacles.push({
+            id: i,
+            x: CANVAS_WIDTH + i * OBSTACLE_SPACING,
+            topHeight,
+            bottomY: topHeight + OBSTACLE_GAP,
+            passed: false,
+          });
+        }
+        setObstacles(initialObstacles);
       }
-      setObstacles(initialObstacles);
+    } else {
+      // Reset obstacles when game is not active
+      setObstacles([]);
+      hitIdsRef.current.clear();
+      setBlinkVisible(true);
     }
-  }, [gameActive, obstacles.length]);
+  }, [gameActive]);
+
+  // Calculate score: count obstacles that have passed
+  useEffect(() => {
+    if (!gameActive) return;
+    const passedCount = obstacles.filter(obs => obs.passed && !scoreHits.includes(obs.id)).length;
+    setScoreHits(obstacles.filter(obs => obs.passed).map(obs => obs.id));
+    onScoreChange(passedCount);
+  }, [obstacles, gameActive, onScoreChange]);
+
+  // Blinking interval for hit obstacles (simulating .blink_me CSS class)
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout | undefined;
+
+    if (gameActive && hasHitObstacles) {
+      intervalId = setInterval(() => {
+        setBlinkVisible((v) => !v); // Toggle visibility every 100ms
+      }, 100); // Toggle every 100ms (200ms total cycle = 100ms visible, 100ms invisible)
+    } else {
+      setBlinkVisible(true); // Show normally when not blinking
+    }
+
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [gameActive, hasHitObstacles]);
 
   // Game loop
   useEffect(() => {
@@ -71,35 +118,98 @@ function FlappyBirdGame({ character, gameActive, onScoreChange, onGameOver }: Fl
     const gameLoop = (currentTime: number) => {
       if (!gameActive) return;
 
-      const deltaTime = currentTime - lastTimeRef.current;
       lastTimeRef.current = currentTime;
 
       // Update bird physics
-      setBirdY((prevY) => {
-        setBirdVelocity((prevVel) => {
-          const newVel = prevVel + GRAVITY;
-          const newY = prevY + newVel;
-          
-          // Check boundaries
-          if (newY < 0 || newY > CANVAS_HEIGHT - BIRD_SIZE) {
-            onGameOver();
-            return prevVel;
-          }
-          
-          return newVel;
+      birdVelocityRef.current += GRAVITY;
+      birdYRef.current += birdVelocityRef.current;
+      
+      // Check boundaries
+      if (birdYRef.current < 0 || birdYRef.current > CANVAS_HEIGHT - BIRD_SIZE) {
+        setBarrierHits((prev) => {
+          const newHits = prev + 1;
+          setTimeout(() => {
+            onBarrierHit(newHits);
+            if (newHits >= DEATH_BARRIERS) {
+              onGameOver();
+            }
+          }, 0);
+          return newHits;
         });
-        return prevY;
-      });
+        birdYRef.current = Math.max(0, Math.min(CANVAS_HEIGHT - BIRD_SIZE, birdYRef.current));
+      }
 
-      // Update obstacles
+      // Update obstacles and check collisions
+      const birdX = 80;
+      const birdCenterY = birdYRef.current + BIRD_SIZE / 2;
+      const birdRightEdge = birdX + BIRD_SIZE;
+
       setObstacles((prevObstacles) => {
+        // Create a map of previous positions for quick lookup
+        const prevPositions = new Map(prevObstacles.map(obs => [obs.id, obs.x]));
+        
+        // First, move obstacles
         const updated = prevObstacles.map((obs) => ({
           ...obs,
           x: obs.x - gameSpeedRef.current,
         }));
 
+        // Then check collisions and mark obstacles as passed
+        const withCollisions = updated.map((obs) => {
+          // Mark obstacle as passed if it has crossed the bird's right edge
+          if (!obs.passed) {
+            const prevX = prevPositions.get(obs.id) ?? obs.x + gameSpeedRef.current;
+            const prevRightEdge = prevX + OBSTACLE_WIDTH;
+            const currentRightEdge = obs.x + OBSTACLE_WIDTH;
+            
+            // Check if obstacle crossed the threshold this frame, or is already behind
+            const justCrossed = prevRightEdge >= birdRightEdge && currentRightEdge < birdRightEdge;
+            const alreadyPassed = currentRightEdge < birdRightEdge;
+            
+            if (justCrossed || alreadyPassed) {
+              return { ...obs, passed: true };
+            }
+          }
+
+          // Check collision
+          if (
+            birdX < obs.x + OBSTACLE_WIDTH &&
+            birdX + BIRD_SIZE > obs.x &&
+            (birdCenterY < obs.topHeight || birdCenterY > obs.bottomY) &&
+            !collisionProcessedRef.current.has(obs.id)
+          ) {
+            collisionProcessedRef.current.add(obs.id);
+            
+            // Add obstacle to hit_ids set for blinking
+            hitIdsRef.current.add(obs.id);
+            setHasHitObstacles(true);
+            
+            // Remove from hit_ids after 200ms
+            setTimeout(() => {
+              hitIdsRef.current.delete(obs.id);
+              if (hitIdsRef.current.size === 0) {
+                setHasHitObstacles(false);
+              }
+            }, 200);
+            
+            setBarrierHits((prev) => {
+              const newHits = prev + 1;
+              // Defer parent update to avoid React warning
+              setTimeout(() => {
+                onBarrierHit(newHits);
+                if (newHits >= DEATH_BARRIERS) {
+                  onGameOver();
+                }
+              }, 0);
+              return newHits;
+            });
+          }
+
+          return obs;
+        });
+
         // Remove off-screen obstacles and add new ones
-        const visible = updated.filter((obs) => obs.x > -OBSTACLE_WIDTH);
+        const visible = withCollisions.filter((obs) => obs.x > -OBSTACLE_WIDTH);
         const lastObstacle = visible[visible.length - 1];
         
         if (lastObstacle && lastObstacle.x < CANVAS_WIDTH - OBSTACLE_SPACING) {
@@ -116,46 +226,22 @@ function FlappyBirdGame({ character, gameActive, onScoreChange, onGameOver }: Fl
         return visible;
       });
 
-      // Check collisions and score
-      setObstacles((prevObstacles) => {
-        const birdX = 80;
-        const birdCenterY = birdY + BIRD_SIZE / 2;
+      console.log('currentTime', currentTime);
+      console.log('lastSpeedIncreaseRef.current', lastSpeedIncreaseRef.current);
 
-        return prevObstacles.map((obs) => {
-          // Check if passed obstacle
-          if (!obs.passed && obs.x + OBSTACLE_WIDTH < birdX) {
-            setScore((prev) => prev + 1);
-            return { ...obs, passed: true };
-          }
-
-          // Check collision
-          if (
-            birdX < obs.x + OBSTACLE_WIDTH &&
-            birdX + BIRD_SIZE > obs.x &&
-            (birdCenterY < obs.topHeight || birdCenterY > obs.bottomY)
-          ) {
-            onGameOver();
-          }
-
-          return obs;
-        });
-      });
-
-      // Increase score every second
-      const now = Date.now();
-      if (now - lastScoreTimeRef.current >= 1000) {
-        setScore((prev) => {
-          const newScore = prev + 1;
-          onScoreChange(newScore);
-          return newScore;
-        });
-        lastScoreTimeRef.current = now;
-      }
-
-      // Increase speed every 10 seconds
-      if (now - lastSpeedIncreaseRef.current >= SPEED_INCREASE_INTERVAL) {
-        gameSpeedRef.current = gameSpeedRef.current * (1 + SPEED_INCREASE_RATE);
-        lastSpeedIncreaseRef.current = now;
+      // Increase speed every 10 seconds (using currentTime from requestAnimationFrame)
+      if (lastSpeedIncreaseRef.current === 0) {
+        // Initialize on first frame - use currentTime as baseline
+        lastSpeedIncreaseRef.current = currentTime;
+        console.log('Initialized lastSpeedIncreaseRef to:', currentTime);
+      } else {
+        // Only check and update if we've already initialized
+        const timeSinceLastIncrease = currentTime - lastSpeedIncreaseRef.current;
+        if (timeSinceLastIncrease >= SPEED_INCREASE_INTERVAL) {
+          gameSpeedRef.current = gameSpeedRef.current * (1 + SPEED_INCREASE_RATE);
+          lastSpeedIncreaseRef.current = currentTime;
+          console.log('Updated lastSpeedIncreaseRef to:', currentTime, 'new speed:', gameSpeedRef.current);
+        }
       }
 
       // Draw
@@ -173,62 +259,66 @@ function FlappyBirdGame({ character, gameActive, onScoreChange, onGameOver }: Fl
 
       // Draw obstacles
       obstacles.forEach((obs) => {
-        ctx.fillStyle = '#228B22';
-        // Top obstacle
-        ctx.fillRect(obs.x, 0, OBSTACLE_WIDTH, obs.topHeight);
-        // Bottom obstacle
-        ctx.fillRect(obs.x, obs.bottomY, OBSTACLE_WIDTH, CANVAS_HEIGHT - obs.bottomY);
-        
-        // Draw obstacle emoji
-        ctx.font = '30px Arial';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(character.obstacle, obs.x + OBSTACLE_WIDTH / 2, obs.topHeight / 2);
-        ctx.fillText(character.obstacle, obs.x + OBSTACLE_WIDTH / 2, obs.bottomY + (CANVAS_HEIGHT - obs.bottomY) / 2);
+        const isInHitIds = hitIdsRef.current.has(obs.id);
+        drawObstacle({
+          obstacle: obs,
+          character,
+          canvasWidth: CANVAS_WIDTH,
+          canvasHeight: CANVAS_HEIGHT,
+          obstacleWidth: OBSTACLE_WIDTH,
+          ctx,
+          isBlinking: isInHitIds && !blinkVisible, // Blink when in hit_ids and blinkVisible is false
+        });
       });
 
       // Draw bird
       ctx.font = '40px Arial';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText(character.emoji, 80 + BIRD_SIZE / 2, birdY + BIRD_SIZE / 2);
+      ctx.fillText(character.emoji, 80 + BIRD_SIZE / 2, birdYRef.current + BIRD_SIZE / 2);
 
       animationFrameRef.current = requestAnimationFrame(gameLoop);
     };
 
     lastTimeRef.current = performance.now();
-    lastScoreTimeRef.current = Date.now();
-    lastSpeedIncreaseRef.current = Date.now();
-    gameSpeedRef.current = 3;
-    animationFrameRef.current = requestAnimationFrame(gameLoop);
+    // Don't reset lastSpeedIncreaseRef here - only reset it when game becomes inactive
+    gameSpeedRef.current = OBSTACLE_SPEED;
+    onScoreChange(0);
+      animationFrameRef.current = requestAnimationFrame(gameLoop);
 
     return () => {
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [gameActive, birdY, birdVelocity, obstacles, character, onGameOver, onScoreChange]);
+  }, [gameActive, character, onGameOver, onScoreChange, onBarrierHit, blinkVisible]);
 
   // Reset game state
   useEffect(() => {
     if (!gameActive) {
-      setBirdY(250);
-      setBirdVelocity(0);
+      birdYRef.current = 250;
+      birdVelocityRef.current = 0;
       setObstacles([]);
-      setScore(0);
-      gameSpeedRef.current = 3;
+      onScoreChange(0);
+      setBarrierHits(0);
+      collisionProcessedRef.current.clear();
+      hitIdsRef.current.clear();
+      setBlinkVisible(true);
+      setHasHitObstacles(false);
+      gameSpeedRef.current = OBSTACLE_SPEED;
       lastSpeedIncreaseRef.current = 0;
-      lastScoreTimeRef.current = 0;
     }
-  }, [gameActive]);
+  }, [gameActive, onScoreChange]);
 
   return (
-    <div className="flappy-bird-game" onPointerDown={handleJump} onTouchStart={handleJump}>
+    <div className="flappy-bird-game">
       <canvas
         ref={canvasRef}
         width={CANVAS_WIDTH}
         height={CANVAS_HEIGHT}
         className="flappy-canvas"
+        onPointerDown={handleJump}
+        onTouchStart={handleJump}
       />
     </div>
   );

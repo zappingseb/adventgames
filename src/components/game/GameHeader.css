@@ -34,6 +34,10 @@
     animation: flicker 200ms;
 }
 
+.score-flicker {
+    animation: flicker 200ms;
+}
+
 @keyframes flicker {
     0%, 100% {
         opacity: 1;
