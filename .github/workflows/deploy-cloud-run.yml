@@ -44,7 +44,7 @@ jobs:
 
       - name: Write games.json from secret
         run: |
-          echo "${{ secrets.GAMES_CONFIG }}" > games.json
+          echo '${{ secrets.GAMES_CONFIG }}' > games.json
 
       - name: Build Docker image
         run: |
