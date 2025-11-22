@@ -34,6 +34,7 @@ const logger = pino({
 // Cloud Storage setup (only in production with GCP_PROJECT)
 let storage = null;
 let scoresBucket = null;
+let serviceAccountEmail = null;
 const SCORES_BUCKET_NAME = process.env.SCORES_BUCKET_NAME || 'adventgames-scores';
 const SCORES_FILE_NAME = 'scores.json';
 const GAMES_ACTIVATION_FILE_NAME = 'games-activation.json';
@@ -51,9 +52,13 @@ async function initCloudStorage() {
     try {
       // Verify the file exists
       await fs.access(keyFilePath);
+      // Read the key file to get the service account email
+      const keyFileContents = await fs.readFile(keyFilePath, 'utf8');
+      const keyData = JSON.parse(keyFileContents);
+      serviceAccountEmail = keyData.client_email || null;
       // Use keyFilename option - Storage client will read and parse the JSON file
       storage = new Storage({ keyFilename: keyFilePath });
-      logger.info({ keyFilePath }, 'Initialized Cloud Storage with service account key');
+      logger.info({ keyFilePath, serviceAccountEmail }, 'Initialized Cloud Storage with service account key');
     } catch (fileError) {
       // If file doesn't exist, use default credentials
       logger.warn({ keyFilePath, error: fileError.message }, 'Service account key file not found, using default credentials');
@@ -226,46 +231,83 @@ async function writeScoresLocal(scores) {
 
 // Read game activations from Cloud Storage
 async function readGameActivations() {
-  if (useCloudStorage && scoresBucket) {
-    try {
-      const [bucketExists] = await scoresBucket.exists();
-      if (!bucketExists) {
-        return {};
-      }
-      
-      const file = scoresBucket.file(GAMES_ACTIVATION_FILE_NAME);
-      const [exists] = await file.exists();
-      if (!exists) {
-        return {};
-      }
-      const [contents] = await file.download();
-      return JSON.parse(contents.toString());
-    } catch (error) {
-      logger.error({ error }, 'Failed to read game activations from Cloud Storage');
+  if (!useCloudStorage) {
+    return {};
+  }
+  
+  if (!scoresBucket) {
+    logger.warn('scoresBucket is not initialized, cannot read game activations');
+    return {};
+  }
+  
+  try {
+    const [bucketExists] = await scoresBucket.exists();
+    if (!bucketExists) {
+      logger.debug({ bucket: SCORES_BUCKET_NAME }, 'Bucket does not exist, returning empty activations');
       return {};
     }
+    
+    const file = scoresBucket.file(GAMES_ACTIVATION_FILE_NAME);
+    const [exists] = await file.exists();
+    if (!exists) {
+      logger.debug('games-activation.json does not exist yet, returning empty activations');
+      return {};
+    }
+    const [contents] = await file.download();
+    const activations = JSON.parse(contents.toString());
+    logger.debug('Successfully read game activations from Cloud Storage');
+    return activations;
+  } catch (error) {
+    logger.error({ 
+      errorMessage: error.message,
+      errorStack: error.stack,
+      errorCode: error.code,
+      errorDetails: error.details,
+      errorName: error.name,
+      bucket: SCORES_BUCKET_NAME,
+      fileName: GAMES_ACTIVATION_FILE_NAME,
+      serviceAccountEmail: serviceAccountEmail,
+      useCloudStorage,
+      scoresBucketExists: !!scoresBucket
+    }, 'Failed to read game activations from Cloud Storage');
+    return {};
   }
-  return {};
 }
 
 // Write game activations to Cloud Storage
 async function writeGameActivations(activations) {
-  if (useCloudStorage && scoresBucket) {
-    try {
-      const [bucketExists] = await scoresBucket.exists();
-      if (!bucketExists) {
-        logger.warn({ bucket: SCORES_BUCKET_NAME }, 'Cloud Storage bucket does not exist, cannot save activations');
-        return;
-      }
-      
-      const file = scoresBucket.file(GAMES_ACTIVATION_FILE_NAME);
-      await file.save(JSON.stringify(activations, null, 2), {
-        contentType: 'application/json',
-      });
-      logger.debug('Saved game activations to Cloud Storage');
-    } catch (error) {
-      logger.error({ error }, 'Failed to write game activations to Cloud Storage');
+  if (!useCloudStorage) {
+    return;
+  }
+  
+  if (!scoresBucket) {
+    logger.warn('scoresBucket is not initialized, cannot write game activations');
+    return;
+  }
+  
+  try {
+    const [bucketExists] = await scoresBucket.exists();
+    if (!bucketExists) {
+      logger.warn({ bucket: SCORES_BUCKET_NAME }, 'Cloud Storage bucket does not exist, cannot save activations');
+      return;
     }
+    
+    const file = scoresBucket.file(GAMES_ACTIVATION_FILE_NAME);
+    await file.save(JSON.stringify(activations, null, 2), {
+      contentType: 'application/json',
+    });
+    logger.debug('Saved game activations to Cloud Storage');
+  } catch (error) {
+    logger.error({ 
+      errorMessage: error.message,
+      errorStack: error.stack,
+      errorCode: error.code,
+      errorDetails: error.details,
+      errorName: error.name,
+      bucket: SCORES_BUCKET_NAME,
+      fileName: GAMES_ACTIVATION_FILE_NAME,
+      serviceAccountEmail: serviceAccountEmail
+    }, 'Failed to write game activations to Cloud Storage');
   }
 }
 
