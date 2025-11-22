@@ -1,9 +1,9 @@
 export const GRAVITY = 0.5;
 export const JUMP_STRENGTH = -8;
-export const OBSTACLE_SPEED = 1;
+export const OBSTACLE_SPEED = 2;
 export const OBSTACLE_GAP = 300; // Increased gap
 export const OBSTACLE_SPACING = 300;
-export const SPEED_INCREASE_INTERVAL = 10000; // 10 seconds in milliseconds
+export const SPEED_INCREASE_INTERVAL = 5000; // 5 seconds in milliseconds
 export const SPEED_INCREASE_RATE = 0.1; // 10% increase
 export const DEATH_BARRIERS = 5; // 5 lives like Snowflake game
 

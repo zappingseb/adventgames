@@ -15,7 +15,8 @@ function FlappyBirdGame({ character, gameActive, onScoreChange, onGameOver, onBa
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationFrameRef = useRef<number | null>(null);
   const lastTimeRef = useRef<number>(0);
-  const lastSpeedIncreaseRef = useRef<number>(0);
+  const startTimeRef = useRef<number>(0);
+  const lastSpeedIncreaseCountRef = useRef<number>(0);
   const gameSpeedRef = useRef<number>(OBSTACLE_SPEED);
   const birdVelocityRef = useRef<number>(0);
   const birdYRef = useRef<number>(250);
@@ -211,21 +212,24 @@ function FlappyBirdGame({ character, gameActive, onScoreChange, onGameOver, onBa
         return visible;
       });
 
-      console.log('currentTime', currentTime);
-      console.log('lastSpeedIncreaseRef.current', lastSpeedIncreaseRef.current);
+      // Increase speed every 10 seconds based on elapsed time since game start
+      const now = Date.now();
+      if (startTimeRef.current > 0) {
+        const elapsedTime = now - startTimeRef.current;
+        console.log('elapsedTime', elapsedTime);
+        const expectedSpeedIncreaseCount = Math.floor(elapsedTime / SPEED_INCREASE_INTERVAL);
 
-      // Increase speed every 10 seconds (using currentTime from requestAnimationFrame)
-      if (lastSpeedIncreaseRef.current === 0) {
-        // Initialize on first frame - use currentTime as baseline
-        lastSpeedIncreaseRef.current = currentTime;
-        console.log('Initialized lastSpeedIncreaseRef to:', currentTime);
-      } else {
-        // Only check and update if we've already initialized
-        const timeSinceLastIncrease = currentTime - lastSpeedIncreaseRef.current;
-        if (timeSinceLastIncrease >= SPEED_INCREASE_INTERVAL) {
-          gameSpeedRef.current = gameSpeedRef.current * (1 + SPEED_INCREASE_RATE);
-          lastSpeedIncreaseRef.current = currentTime;
-          console.log('Updated lastSpeedIncreaseRef to:', currentTime, 'new speed:', gameSpeedRef.current);
+        console.log('expectedSpeedIncreaseCount', expectedSpeedIncreaseCount);
+        console.log('lastSpeedIncreaseCountRef.current', lastSpeedIncreaseCountRef.current);
+        
+        // Apply speed increases for all intervals that have passed
+        if (expectedSpeedIncreaseCount > lastSpeedIncreaseCountRef.current) {
+          const increasesToApply = expectedSpeedIncreaseCount - lastSpeedIncreaseCountRef.current;
+          for (let i = 0; i < increasesToApply; i++) {
+            gameSpeedRef.current = gameSpeedRef.current * (1 + SPEED_INCREASE_RATE);
+          }
+          lastSpeedIncreaseCountRef.current = expectedSpeedIncreaseCount;
+          console.log('Speed increased', increasesToApply, 'time(s). New speed:', gameSpeedRef.current);
         }
       }
 
@@ -261,21 +265,32 @@ function FlappyBirdGame({ character, gameActive, onScoreChange, onGameOver, onBa
       ctx.textBaseline = 'middle';
       ctx.fillText(character.emoji, 80 + BIRD_SIZE / 2, birdYRef.current + BIRD_SIZE / 2);
 
+      // Draw speed in top right corner
+      ctx.font = '16px Arial';
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'bottom';
+      ctx.fillStyle = '#000000';
+      ctx.fillText(`Speed: ${gameSpeedRef.current.toFixed(2)}`, CANVAS_WIDTH - 10, 10);
+
       animationFrameRef.current = requestAnimationFrame(gameLoop);
     };
 
     lastTimeRef.current = performance.now();
-    // Don't reset lastSpeedIncreaseRef here - only reset it when game becomes inactive
-    gameSpeedRef.current = OBSTACLE_SPEED;
+    // Only set startTimeRef if it hasn't been set yet (game just started)
+    if (startTimeRef.current === 0) {
+      startTimeRef.current = Date.now();
+      lastSpeedIncreaseCountRef.current = 0;
+      gameSpeedRef.current = OBSTACLE_SPEED;
+    }
     onScoreChange(0);
-      animationFrameRef.current = requestAnimationFrame(gameLoop);
+    animationFrameRef.current = requestAnimationFrame(gameLoop);
 
     return () => {
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [gameActive, character, onGameOver, onScoreChange, onBarrierHit, blinkVisible]);
+  }, [gameActive, obstacles, character, onGameOver, onScoreChange, onBarrierHit, blinkVisible]);
 
   // Reset game state
   useEffect(() => {
@@ -289,7 +304,8 @@ function FlappyBirdGame({ character, gameActive, onScoreChange, onGameOver, onBa
       setBlinkVisible(true);
       setHasHitObstacles(false);
       gameSpeedRef.current = OBSTACLE_SPEED;
-      lastSpeedIncreaseRef.current = 0;
+      startTimeRef.current = 0;
+      lastSpeedIncreaseCountRef.current = 0;
     }
   }, [gameActive, onScoreChange]);
 
