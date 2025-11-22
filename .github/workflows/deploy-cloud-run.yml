@@ -42,6 +42,17 @@ jobs:
         run: |
           echo "${{ secrets.GCP_STORAGE_ADMIN_KEY }}" > gcloud-storage-admin-key.json
 
+      - name: Write games.json from secret (strip activated field)
+        run: |
+          echo "${{ secrets.GAMES_CONFIG }}" | node -e "
+            const data = JSON.parse(require('fs').readFileSync(0, 'utf-8'));
+            data.games = data.games.map(game => {
+              const { activated, ...gameWithoutActivated } = game;
+              return gameWithoutActivated;
+            });
+            require('fs').writeFileSync('games.json', JSON.stringify(data, null, 2));
+          "
+
       - name: Build Docker image
         run: |
           docker build -t $IMAGE_NAME:$GITHUB_SHA -t $IMAGE_NAME:latest .
@@ -64,7 +75,7 @@ jobs:
             --max-instances 2 \
             --timeout 300 \
             --port 3000 \
-            --set-env-vars NODE_ENV=production,GAMES_CONFIG="${{ secrets.GAMES_CONFIG }}" \
+            --set-env-vars NODE_ENV=production \
             --set-env-vars GCP_PROJECT=${{ secrets.GCP_PROJECT_ID }} \
             --set-env-vars SCORES_BUCKET_NAME=${{ secrets.SCORES_BUCKET_NAME || 'adventgames-scores' }}
 
