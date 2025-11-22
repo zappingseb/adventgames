@@ -403,7 +403,9 @@ app.post('/api/scores/:game', async (req, res) => {
 app.get('/api/games', async (req, res) => {
   try {
     const gamesData = await getGames();
-    res.json(gamesData.games || []);
+    // Remove code field from response
+    const gamesWithoutCode = (gamesData.games || []).map(({ code, ...game }) => game);
+    res.json(gamesWithoutCode);
   } catch (error) {
     res.status(500).json({ error: 'Failed to read games' });
   }

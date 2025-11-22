@@ -11,3 +11,4 @@ yarn-error.log*
 data/
 swag/
 gcloud-storage-admin-key.json
+games-activation.json
