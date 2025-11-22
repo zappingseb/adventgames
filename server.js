@@ -36,6 +36,7 @@ let storage = null;
 let scoresBucket = null;
 const SCORES_BUCKET_NAME = process.env.SCORES_BUCKET_NAME || 'adventgames-scores';
 const SCORES_FILE_NAME = 'scores.json';
+const GAMES_ACTIVATION_FILE_NAME = 'games-activation.json';
 
 // Initialize Cloud Storage (called during startup)
 async function initCloudStorage() {
@@ -221,13 +222,58 @@ async function writeScoresLocal(scores) {
   }
 }
 
-// ===== GAMES MANAGEMENT (GitHub Secrets + Cloud Run Env Vars) =====
+// ===== GAMES MANAGEMENT =====
 
-// Load games from GAMES_CONFIG env var (from GitHub Secrets) and merge with activated states
+// Read game activations from Cloud Storage
+async function readGameActivations() {
+  if (useCloudStorage && scoresBucket) {
+    try {
+      const [bucketExists] = await scoresBucket.exists();
+      if (!bucketExists) {
+        return {};
+      }
+      
+      const file = scoresBucket.file(GAMES_ACTIVATION_FILE_NAME);
+      const [exists] = await file.exists();
+      if (!exists) {
+        return {};
+      }
+      const [contents] = await file.download();
+      return JSON.parse(contents.toString());
+    } catch (error) {
+      logger.error({ error }, 'Failed to read game activations from Cloud Storage');
+      return {};
+    }
+  }
+  return {};
+}
+
+// Write game activations to Cloud Storage
+async function writeGameActivations(activations) {
+  if (useCloudStorage && scoresBucket) {
+    try {
+      const [bucketExists] = await scoresBucket.exists();
+      if (!bucketExists) {
+        logger.warn({ bucket: SCORES_BUCKET_NAME }, 'Cloud Storage bucket does not exist, cannot save activations');
+        return;
+      }
+      
+      const file = scoresBucket.file(GAMES_ACTIVATION_FILE_NAME);
+      await file.save(JSON.stringify(activations, null, 2), {
+        contentType: 'application/json',
+      });
+      logger.debug('Saved game activations to Cloud Storage');
+    } catch (error) {
+      logger.error({ error }, 'Failed to write game activations to Cloud Storage');
+    }
+  }
+}
+
+// Load games from games.json and merge with activation states
 async function loadGames() {
   let games = [];
   
-  // In development mode, prioritize local games.json file
+  // In development mode, read from local games.json (includes activated field)
   if (isDev) {
     try {
       const gamesFile = path.join(__dirname, 'games.json');
@@ -236,69 +282,35 @@ async function loadGames() {
       games = gamesData.games || [];
       logger.debug('Loaded games from local games.json (dev mode)');
     } catch (error) {
-      logger.warn({ error: error.message }, 'No games.json found locally, trying GAMES_CONFIG env var');
-      // Fallback to GAMES_CONFIG if local file doesn't exist
-      if (process.env.GAMES_CONFIG) {
-        try {
-          const gamesConfig = JSON.parse(process.env.GAMES_CONFIG);
-          games = gamesConfig.games || [];
-        } catch (parseError) {
-          logger.error({ error: parseError }, 'Failed to parse GAMES_CONFIG');
-        }
-      }
+      logger.warn({ error: error.message }, 'No games.json found locally');
+      games = [];
     }
   } else {
-    // In production, prioritize GAMES_CONFIG env var (from GitHub Secrets)
-    if (process.env.GAMES_CONFIG) {
-      try {
-        const gamesConfig = JSON.parse(process.env.GAMES_CONFIG);
-        games = gamesConfig.games || [];
-      } catch (error) {
-        logger.error({ error }, 'Failed to parse GAMES_CONFIG');
-      }
+    // In production, read games.json from Dockerfile (no activated field)
+    try {
+      const gamesFile = path.join(__dirname, 'games.json');
+      const data = await fs.readFile(gamesFile, 'utf8');
+      const gamesData = JSON.parse(data);
+      games = gamesData.games || [];
+      logger.debug('Loaded games from games.json (production)');
+    } catch (error) {
+      logger.warn({ error: error.message }, 'No games.json found in Docker image');
+      games = [];
     }
     
-    // Fallback to local file if GAMES_CONFIG is not set (for backward compatibility)
-    if (games.length === 0) {
-      try {
-        const gamesFile = path.join(__dirname, 'games.json');
-        const data = await fs.readFile(gamesFile, 'utf8');
-        const gamesData = JSON.parse(data);
-        games = gamesData.games || [];
-      } catch (error) {
-        logger.warn('No games.json found locally, using empty array');
-        games = [];
-      }
-    }
+    // Merge with activation states from Cloud Storage
+    const activations = await readGameActivations();
+    games = games.map(game => {
+      // Use activation from Cloud Storage, default to false if not found
+      game.activated = activations[game.code] === true;
+      return game;
+    });
   }
-  
-  // Merge activated states from environment variables
-  // Format: GAME_<CODE>_ACTIVATED=true/false
-  // Example: GAME_FLAPPYBIRD2024_ACTIVATED=true
-  // In dev mode: env vars override the activated field from games.json
-  // In production: env vars are the source of truth
-  games = games.map(game => {
-    const envVarName = `GAME_${game.code}_ACTIVATED`;
-    const activatedEnv = process.env[envVarName];
-    
-    if (activatedEnv !== undefined) {
-      // Environment variable takes precedence
-      game.activated = activatedEnv === 'true' || activatedEnv === '1';
-    } else if (isDev) {
-      // In dev mode, keep the activated value from games.json if no env var is set
-      game.activated = game.activated !== undefined ? game.activated : false;
-    } else {
-      // In production, default to false if not specified
-      game.activated = false;
-    }
-    
-    return game;
-  });
   
   return games;
 }
 
-// Get games (always read fresh to pick up env var changes)
+// Get games (always read fresh to pick up activation changes)
 async function getGames() {
   return { games: await loadGames() };
 }
@@ -356,8 +368,6 @@ app.get('/api/games', async (req, res) => {
 });
 
 // API: Activate game with code
-// Note: In production, activation should be done via Cloud Run environment variables
-// This endpoint is kept for backward compatibility but won't persist in Cloud Run
 app.post('/api/games/activate', async (req, res) => {
   try {
     const { code } = req.body;
@@ -377,18 +387,16 @@ app.post('/api/games/activate', async (req, res) => {
       return res.json({ success: true, game, message: 'Game already activated' });
     }
     
-    // In production with Cloud Run, activation is controlled by env vars
-    // This endpoint will only work temporarily until the instance restarts
+    // In production, save activation to Cloud Storage
     if (useCloudStorage) {
-      return res.json({ 
-        success: false, 
-        message: 'Activation must be done via Cloud Run environment variables. Set GAME_' + code + '_ACTIVATED=true',
-        game 
-      });
+      const activations = await readGameActivations();
+      activations[code] = true;
+      await writeGameActivations(activations);
+      game.activated = true;
+      return res.json({ success: true, game });
     }
     
-    // For local development, we can still update the file
-    game.activated = true;
+    // For local development, update games.json file
     const gamesFile = path.join(__dirname, 'games.json');
     try {
       const currentGames = JSON.parse(await fs.readFile(gamesFile, 'utf8'));
@@ -396,13 +404,16 @@ app.post('/api/games/activate', async (req, res) => {
       if (gameIndex !== -1) {
         currentGames.games[gameIndex].activated = true;
         await fs.writeFile(gamesFile, JSON.stringify(currentGames, null, 2));
+        game.activated = true;
       }
     } catch (error) {
       logger.error({ error }, 'Failed to update games.json locally');
+      return res.status(500).json({ error: 'Failed to activate game' });
     }
     
     res.json({ success: true, game });
   } catch (error) {
+    logger.error({ error }, 'Failed to activate game');
     res.status(500).json({ error: 'Failed to activate game' });
   }
 });
@@ -434,8 +445,7 @@ async function start() {
       } else {
         logger.info('Using local filesystem for scores');
       }
-      const gamesSource = process.env.GAMES_CONFIG ? 'GAMES_CONFIG env var (GitHub Secrets)' : 'local games.json (fallback)';
-      logger.info({ gamesSource }, 'Games loaded from');
+      logger.info('Games loaded from games.json (Docker image) with activations from Cloud Storage');
     }
   });
 }
