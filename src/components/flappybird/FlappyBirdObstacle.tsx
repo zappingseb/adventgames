@@ -11,7 +11,6 @@ export interface Obstacle {
 interface FlappyBirdObstacleProps {
   obstacle: Obstacle;
   character: Character;
-  canvasWidth: number;
   canvasHeight: number;
   obstacleWidth: number;
   ctx: CanvasRenderingContext2D;
@@ -21,7 +20,6 @@ interface FlappyBirdObstacleProps {
 export function drawObstacle({
   obstacle,
   character,
-  canvasWidth,
   canvasHeight,
   obstacleWidth,
   ctx,

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { Character, GRAVITY, JUMP_STRENGTH, OBSTACLE_GAP, OBSTACLE_SPACING, SPEED_INCREASE_INTERVAL, SPEED_INCREASE_RATE, DEATH_BARRIERS, OBSTACLE_SPEED } from '../../constants/flappyBirdConstants';
+import { Character, GRAVITY, JUMP_STRENGTH, OBSTACLE_GAP, OBSTACLE_SPACING, SPEED_INCREASE_INTERVAL, SPEED_INCREASE_RATE, OBSTACLE_SPEED } from '../../constants/flappyBirdConstants';
 import { drawObstacle, Obstacle } from './FlappyBirdObstacle';
 import './FlappyBirdGame.css';
 
@@ -21,7 +21,6 @@ function FlappyBirdGame({ character, gameActive, onScoreChange, onGameOver, onBa
   const birdYRef = useRef<number>(250);
   
   const [obstacles, setObstacles] = useState<Obstacle[]>([]);
-  const [barrierHits, setBarrierHits] = useState<number>(0);
   const [scoreHits, setScoreHits] = useState<number[]>([]);
   const collisionProcessedRef = useRef<Set<number>>(new Set());
   const hitIdsRef = useRef<Set<number>>(new Set());
@@ -126,16 +125,9 @@ function FlappyBirdGame({ character, gameActive, onScoreChange, onGameOver, onBa
       
       // Check boundaries
       if (birdYRef.current < 0 || birdYRef.current > CANVAS_HEIGHT - BIRD_SIZE) {
-        setBarrierHits((prev) => {
-          const newHits = prev + 1;
-          setTimeout(() => {
-            onBarrierHit(newHits);
-            if (newHits >= DEATH_BARRIERS) {
-              onGameOver();
-            }
-          }, 0);
-          return newHits;
-        });
+        setTimeout(() => {
+          onBarrierHit(1); // Increment by 1, parent will handle the state
+        }, 0);
         birdYRef.current = Math.max(0, Math.min(CANVAS_HEIGHT - BIRD_SIZE, birdYRef.current));
       }
 
@@ -192,17 +184,10 @@ function FlappyBirdGame({ character, gameActive, onScoreChange, onGameOver, onBa
               }
             }, 200);
             
-            setBarrierHits((prev) => {
-              const newHits = prev + 1;
-              // Defer parent update to avoid React warning
-              setTimeout(() => {
-                onBarrierHit(newHits);
-                if (newHits >= DEATH_BARRIERS) {
-                  onGameOver();
-                }
-              }, 0);
-              return newHits;
-            });
+            // Defer parent update to avoid React warning
+            setTimeout(() => {
+              onBarrierHit(1); // Increment by 1, parent will handle the state
+            }, 0);
           }
 
           return obs;
@@ -263,7 +248,6 @@ function FlappyBirdGame({ character, gameActive, onScoreChange, onGameOver, onBa
         drawObstacle({
           obstacle: obs,
           character,
-          canvasWidth: CANVAS_WIDTH,
           canvasHeight: CANVAS_HEIGHT,
           obstacleWidth: OBSTACLE_WIDTH,
           ctx,
@@ -300,7 +284,6 @@ function FlappyBirdGame({ character, gameActive, onScoreChange, onGameOver, onBa
       birdVelocityRef.current = 0;
       setObstacles([]);
       onScoreChange(0);
-      setBarrierHits(0);
       collisionProcessedRef.current.clear();
       hitIdsRef.current.clear();
       setBlinkVisible(true);

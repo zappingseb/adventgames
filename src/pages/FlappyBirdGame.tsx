@@ -96,7 +96,15 @@ function FlappyBirdGamePage() {
                 gameActive={gameActive}
                 onScoreChange={handleScoreChange}
                 onGameOver={handleGameOver}
-                onBarrierHit={setBarrierHits}
+                onBarrierHit={(increment) => {
+                  setBarrierHits((prev) => {
+                    const newHits = prev + increment;
+                    if (newHits >= 5) {
+                      handleGameOver();
+                    }
+                    return newHits;
+                  });
+                }}
               />
             )}
             {gameOver && (
