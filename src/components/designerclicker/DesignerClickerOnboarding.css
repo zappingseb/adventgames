@@ -1,0 +1,188 @@
+.onboarding-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.onboarding-overlay-bounce {
+  animation: bounce 2s infinite;
+}
+
+.onboarding-overlay-bounceSidebar {
+  animation: bounceSidebar 2s infinite;
+}
+
+.onboarding-content {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 20px 30px;
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  max-width: 300px;
+  pointer-events: auto;
+  cursor: pointer;
+  transition: all 0.5s ease;
+}
+
+.onboarding-content:hover {
+  transform: scale(1.05) !important;
+}
+
+.onboarding-content p {
+  margin: 0 0 10px 0;
+  font-size: 1.1em;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.onboarding-arrow {
+  font-size: 2em;
+  margin-top: 5px;
+  animation: bounceArrow 1s infinite;
+  display: inline-block;
+}
+
+.onboarding-arrow-down::before {
+  content: "↓";
+}
+
+.onboarding-arrow-up::before {
+  content: "↑";
+}
+
+.onboarding-arrow-left::before {
+  content: "←";
+}
+
+.onboarding-arrow-right::before {
+  content: "→";
+}
+
+.onboarding-arrow-down {
+  animation: bounceArrowDown 1s infinite;
+}
+
+.onboarding-arrow-up {
+  animation: bounceArrowUp 1s infinite;
+}
+
+.onboarding-arrow-left {
+  animation: bounceArrowLeft 1s infinite;
+}
+
+.onboarding-arrow-right {
+  animation: bounceArrowRight 1s infinite;
+}
+
+.onboarding-skip-button {
+  position: fixed;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.9);
+  border: 3px solid rgba(255, 255, 255, 0.5);
+  color: #000;
+  padding: 16px 48px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 1.2em;
+  font-weight: 700;
+  letter-spacing: 2px;
+  transition: all 0.3s ease;
+  pointer-events: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  z-index: 1001;
+}
+
+.onboarding-skip-button:hover {
+  background: rgba(255, 255, 255, 1);
+  transform: translateX(-50%) scale(1.05);
+  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.4);
+}
+
+.onboarding-skip-button:active {
+  transform: translateX(-50%) scale(0.98);
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes bounceSidebar {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-10px);
+  }
+}
+
+@keyframes bounceArrowDown {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(5px);
+  }
+}
+
+@keyframes bounceArrowUp {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes bounceArrowLeft {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-5px);
+  }
+}
+
+@keyframes bounceArrowRight {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(5px);
+  }
+}
+
+@media (max-width: 768px) {
+  .onboarding-content {
+    padding: 12px 20px;
+    font-size: 0.9em;
+    max-width: 250px;
+  }
+
+  .onboarding-content p {
+    font-size: 0.95em;
+  }
+
+  .onboarding-content {
+    max-width: 200px;
+  }
+  
+  .onboarding-content[style*="right: 100px"] {
+    right: 60px !important;
+  }
+}
+

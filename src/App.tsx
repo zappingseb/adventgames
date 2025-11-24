@@ -3,6 +3,7 @@ import Home from './pages/Home';
 import SnowflakeGame from './pages/SnowflakeGame';
 import FlappyBirdGamePage from './pages/FlappyBirdGame';
 import TypographyGame from './pages/TypographyGame';
+import DesignerClicker from './pages/DesignerClicker';
 
 function App() {
   return (
@@ -11,6 +12,7 @@ function App() {
       <Route path="/snowflake" element={<SnowflakeGame />} />
       <Route path="/flappybird" element={<FlappyBirdGamePage />} />
       <Route path="/typography" element={<TypographyGame />} />
+      <Route path="/designerclicker" element={<DesignerClicker />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
