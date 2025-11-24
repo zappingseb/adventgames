@@ -45,12 +45,12 @@ function GameOver({ finalScore, onRestart, mode = 'gameOver', gameName = 'snowfl
           <h2>Game Over!</h2>
           <p>
             {gameName === 'flappybird' 
-              ? `You scored ${finalScore} points!`
+              ? `You scored ${finalScore ?? 0} points!`
               : gameName === 'typography'
-              ? `You sorted ${finalScore} typography samples correctly!`
+              ? `You sorted ${finalScore ?? 0} typography samples correctly!`
               : gameName === 'designerclicker'
-              ? `You earned ${finalScore.toLocaleString()} Inspiration Points!`
-              : `You caught ${finalScore} snowflakes!`}
+              ? `You earned ${(finalScore ?? 0).toLocaleString()} Inspiration Points!`
+              : `You caught ${finalScore ?? 0} snowflakes!`}
           </p>
           
           <Leaderboard gameName={gameName} />
