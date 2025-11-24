@@ -1,0 +1,7 @@
+export const TYPOGRAPHY_CONSTANTS = {
+  SWIPE_THRESHOLD: 100, // pixels
+  SWIPE_VELOCITY_THRESHOLD: 0.3, // pixels per ms
+  CARDS_PER_LEVEL: 10,
+  MAX_MISTAKES: 3
+};
+

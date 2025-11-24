@@ -1,17 +1,22 @@
 import { useEffect, useState } from 'react';
 import { DEATH_FLAKES } from '../../constants/gameConstants';
 import './GameHeader.css';
+import { TYPOGRAPHY_CONSTANTS } from '../../constants/typographyConstants';
 
 interface GameHeaderProps {
   score: number;
   groundFlakes: number;
   level: number;
   onBack: () => void;
-  gameType?: 'snowflake' | 'flappybird';
+  gameType?: 'snowflake' | 'flappybird' | 'typography';
 }
 
 function GameHeader({ score, groundFlakes, level, onBack, gameType = 'snowflake' }: GameHeaderProps) {
-  const remaining = gameType === 'flappybird' ? 5 - groundFlakes : DEATH_FLAKES - groundFlakes;
+  const remaining = gameType === 'flappybird' 
+    ? 5 - groundFlakes 
+    : gameType === 'typography'
+    ? TYPOGRAPHY_CONSTANTS.MAX_MISTAKES - groundFlakes
+    : DEATH_FLAKES - groundFlakes;
   const [isFlickering, setIsFlickering] = useState(false);
   const [scoreFlickering, setScoreFlickering] = useState(false);
 
@@ -41,11 +46,11 @@ function GameHeader({ score, groundFlakes, level, onBack, gameType = 'snowflake'
     <div className="game-header">
       <div className="score-display">
         <span className={scoreFlickering ? 'score-flicker' : ''}>
-          {gameType === 'flappybird' ? 'Score' : 'Flakes'}: <span>{score}</span>
+          {gameType === 'flappybird' || gameType === 'typography' ? 'Score' : 'Flakes'}: <span>{score}</span>
         </span>
-        {gameType === 'snowflake' && <span className="level-display">Level: {level}</span>}
+        {(gameType === 'snowflake' || gameType === 'typography') && <span className="level-display">Level: {level}</span>}
         <span className={`death-count ${isFlickering ? 'flicker' : ''}`}>
-          {gameType === 'flappybird' ? '💀' : '💀'} {remaining}
+          {gameType === 'typography' ? '❌' : '💀'} {remaining}
         </span>
       </div>
       <a href="/" className="back-btn" onClick={(e) => {

@@ -1,0 +1,1103 @@
+{
+  "levels": [
+    {
+      "id": 1,
+      "name": "Serif vs Sans-Serif",
+      "binLeft": "SERIF",
+      "binRight": "SANS-SERIF",
+      "showFontName": true,
+      "useCompanyPairs": false,
+      "items": [
+        {
+          "id": "serif-1",
+          "fontName": "Times New Roman",
+          "fontFamily": "Times New Roman, serif",
+          "category": "serif",
+          "text": "Aa",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "serif-2",
+          "fontName": "Georgia",
+          "fontFamily": "Georgia, serif",
+          "category": "serif",
+          "text": "The",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "serif-3",
+          "fontName": "Garamond",
+          "fontFamily": "Garamond, serif",
+          "category": "serif",
+          "text": "Quick",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "serif-4",
+          "fontName": "Baskerville",
+          "fontFamily": "Baskerville, serif",
+          "category": "serif",
+          "text": "Type",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "serif-5",
+          "fontName": "Caslon",
+          "fontFamily": "Caslon, serif",
+          "category": "serif",
+          "text": "Aa",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "serif-6",
+          "fontName": "Bodoni",
+          "fontFamily": "Bodoni, serif",
+          "category": "serif",
+          "text": "The",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "serif-7",
+          "fontName": "Didot",
+          "fontFamily": "Didot, serif",
+          "category": "serif",
+          "text": "Quick",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "serif-8",
+          "fontName": "Minion Pro",
+          "fontFamily": "Minion Pro, serif",
+          "category": "serif",
+          "text": "Type",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "serif-9",
+          "fontName": "Palatino",
+          "fontFamily": "Palatino, serif",
+          "category": "serif",
+          "text": "Aa",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "serif-10",
+          "fontName": "Trajan Pro",
+          "fontFamily": "Trajan Pro, serif",
+          "category": "serif",
+          "text": "The",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "sans-1",
+          "fontName": "Helvetica",
+          "fontFamily": "Helvetica, Arial, sans-serif",
+          "category": "sans-serif",
+          "text": "Aa",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "sans-2",
+          "fontName": "Arial",
+          "fontFamily": "Arial, sans-serif",
+          "category": "sans-serif",
+          "text": "The",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "sans-3",
+          "fontName": "Futura",
+          "fontFamily": "Futura, sans-serif",
+          "category": "sans-serif",
+          "text": "Quick",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "sans-4",
+          "fontName": "Gotham",
+          "fontFamily": "Gotham, sans-serif",
+          "category": "sans-serif",
+          "text": "Type",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "sans-5",
+          "fontName": "Proxima Nova",
+          "fontFamily": "Proxima Nova, sans-serif",
+          "category": "sans-serif",
+          "text": "Aa",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "sans-6",
+          "fontName": "Montserrat",
+          "fontFamily": "Montserrat, sans-serif",
+          "category": "sans-serif",
+          "text": "The",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "sans-7",
+          "fontName": "Open Sans",
+          "fontFamily": "Open Sans, sans-serif",
+          "category": "sans-serif",
+          "text": "Quick",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "sans-8",
+          "fontName": "Roboto",
+          "fontFamily": "Roboto, sans-serif",
+          "category": "sans-serif",
+          "text": "Type",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "sans-9",
+          "fontName": "Inter",
+          "fontFamily": "Inter, sans-serif",
+          "category": "sans-serif",
+          "text": "Aa",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "sans-10",
+          "fontName": "Gill Sans",
+          "fontFamily": "Gill Sans, sans-serif",
+          "category": "sans-serif",
+          "text": "The",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "2000s vs 2020s",
+      "binLeft": "2000s",
+      "binRight": "2020s",
+      "showFontName": true,
+      "useCompanyPairs": false,
+      "items": [
+        {
+          "id": "2000s-1",
+          "fontName": "Comic Sans MS",
+          "fontFamily": "Comic Sans MS, cursive",
+          "category": "2000s",
+          "text": "Hello",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "2000s-2",
+          "fontName": "Papyrus",
+          "fontFamily": "Papyrus, fantasy",
+          "category": "2000s",
+          "text": "Welcome",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "2000s-3",
+          "fontName": "Impact",
+          "fontFamily": "Impact, fantasy",
+          "category": "2000s",
+          "text": "Design",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "2000s-4",
+          "fontName": "Arial Black",
+          "fontFamily": "Arial Black, sans-serif",
+          "category": "2000s",
+          "text": "Modern",
+          "fontWeight": "900",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "2000s-5",
+          "fontName": "Verdana",
+          "fontFamily": "Verdana, sans-serif",
+          "category": "2000s",
+          "text": "Hello",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "2000s-6",
+          "fontName": "Trebuchet MS",
+          "fontFamily": "Trebuchet MS, sans-serif",
+          "category": "2000s",
+          "text": "Welcome",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "2000s-7",
+          "fontName": "Tahoma",
+          "fontFamily": "Tahoma, sans-serif",
+          "category": "2000s",
+          "text": "Design",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "2000s-8",
+          "fontName": "Lucida Grande",
+          "fontFamily": "Lucida Grande, sans-serif",
+          "category": "2000s",
+          "text": "Modern",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "2000s-9",
+          "fontName": "Myriad Pro",
+          "fontFamily": "Myriad Pro, sans-serif",
+          "category": "2000s",
+          "text": "Hello",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "2000s-10",
+          "fontName": "Frutiger",
+          "fontFamily": "Frutiger, sans-serif",
+          "category": "2000s",
+          "text": "Welcome",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "2020s-1",
+          "fontName": "Inter",
+          "fontFamily": "Inter, sans-serif",
+          "category": "2020s",
+          "text": "Hello",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "2020s-2",
+          "fontName": "Poppins",
+          "fontFamily": "Poppins, sans-serif",
+          "category": "2020s",
+          "text": "Welcome",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "2020s-3",
+          "fontName": "DM Sans",
+          "fontFamily": "DM Sans, sans-serif",
+          "category": "2020s",
+          "text": "Design",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "2020s-4",
+          "fontName": "Space Grotesk",
+          "fontFamily": "Space Grotesk, sans-serif",
+          "category": "2020s",
+          "text": "Modern",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "2020s-5",
+          "fontName": "Manrope",
+          "fontFamily": "Manrope, sans-serif",
+          "category": "2020s",
+          "text": "Hello",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "2020s-6",
+          "fontName": "Outfit",
+          "fontFamily": "Outfit, sans-serif",
+          "category": "2020s",
+          "text": "Welcome",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "2020s-7",
+          "fontName": "Plus Jakarta Sans",
+          "fontFamily": "Plus Jakarta Sans, sans-serif",
+          "category": "2020s",
+          "text": "Design",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "2020s-8",
+          "fontName": "Work Sans",
+          "fontFamily": "Work Sans, sans-serif",
+          "category": "2020s",
+          "text": "Modern",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "2020s-9",
+          "fontName": "Sora",
+          "fontFamily": "Sora, sans-serif",
+          "category": "2020s",
+          "text": "Hello",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "2020s-10",
+          "fontName": "Geist",
+          "fontFamily": "Geist, sans-serif",
+          "category": "2020s",
+          "text": "Welcome",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Font Weight",
+      "binLeft": "LIGHT/REGULAR",
+      "binRight": "BOLD/BLACK",
+      "showFontName": true,
+      "useCompanyPairs": false,
+      "items": [
+        {
+          "id": "weight-light-1",
+          "fontName": "Inter",
+          "fontFamily": "Inter, sans-serif",
+          "category": "light",
+          "text": "Design",
+          "fontWeight": "300",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "weight-light-2",
+          "fontName": "Inter",
+          "fontFamily": "Inter, sans-serif",
+          "category": "light",
+          "text": "Typography",
+          "fontWeight": "300",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "weight-light-3",
+          "fontName": "Inter",
+          "fontFamily": "Inter, sans-serif",
+          "category": "light",
+          "text": "Font",
+          "fontWeight": "300",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "weight-regular-1",
+          "fontName": "Inter",
+          "fontFamily": "Inter, sans-serif",
+          "category": "light",
+          "text": "Design",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "weight-regular-2",
+          "fontName": "Inter",
+          "fontFamily": "Inter, sans-serif",
+          "category": "light",
+          "text": "Typography",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "weight-regular-3",
+          "fontName": "Inter",
+          "fontFamily": "Inter, sans-serif",
+          "category": "light",
+          "text": "Font",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "weight-bold-1",
+          "fontName": "Inter",
+          "fontFamily": "Inter, sans-serif",
+          "category": "bold",
+          "text": "Design",
+          "fontWeight": "700",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "weight-bold-2",
+          "fontName": "Inter",
+          "fontFamily": "Inter, sans-serif",
+          "category": "bold",
+          "text": "Typography",
+          "fontWeight": "700",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "weight-bold-3",
+          "fontName": "Inter",
+          "fontFamily": "Inter, sans-serif",
+          "category": "bold",
+          "text": "Font",
+          "fontWeight": "700",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "weight-black-1",
+          "fontName": "Inter",
+          "fontFamily": "Inter, sans-serif",
+          "category": "bold",
+          "text": "Design",
+          "fontWeight": "900",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "weight-black-2",
+          "fontName": "Inter",
+          "fontFamily": "Inter, sans-serif",
+          "category": "bold",
+          "text": "Typography",
+          "fontWeight": "900",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "weight-black-3",
+          "fontName": "Inter",
+          "fontFamily": "Inter, sans-serif",
+          "category": "bold",
+          "text": "Font",
+          "fontWeight": "900",
+          "fontStyle": "normal"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Display vs Body",
+      "binLeft": "DISPLAY",
+      "binRight": "BODY TEXT",
+      "showFontName": true,
+      "useCompanyPairs": false,
+      "items": [
+        {
+          "id": "display-1",
+          "fontName": "Bebas Neue",
+          "fontFamily": "'Bebas Neue', sans-serif",
+          "category": "display",
+          "text": "BIG HEADLINE",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "display-2",
+          "fontName": "Oswald",
+          "fontFamily": "'Oswald', sans-serif",
+          "category": "display",
+          "text": "HERO TEXT",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "display-3",
+          "fontName": "Anton",
+          "fontFamily": "'Anton', sans-serif",
+          "category": "display",
+          "text": "TITLE",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "display-4",
+          "fontName": "Impact",
+          "fontFamily": "Impact, fantasy",
+          "category": "display",
+          "text": "BOLD",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "display-5",
+          "fontName": "Futura",
+          "fontFamily": "Futura, sans-serif",
+          "category": "display",
+          "text": "HEADLINE",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "body-1",
+          "fontName": "Inter",
+          "fontFamily": "Inter, sans-serif",
+          "category": "body",
+          "text": "This is body text that is designed for reading long paragraphs and articles.",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "body-2",
+          "fontName": "Open Sans",
+          "fontFamily": "Open Sans, sans-serif",
+          "category": "body",
+          "text": "Body fonts are optimized for readability at smaller sizes.",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "body-3",
+          "fontName": "Roboto",
+          "fontFamily": "Roboto, sans-serif",
+          "category": "body",
+          "text": "They work well in paragraphs and extended reading.",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "body-4",
+          "fontName": "Lato",
+          "fontFamily": "Lato, sans-serif",
+          "category": "body",
+          "text": "Comfortable spacing and clear letterforms.",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "body-5",
+          "fontName": "Source Sans Pro",
+          "fontFamily": "'Source Sans Pro', sans-serif",
+          "category": "body",
+          "text": "Perfect for articles and documentation.",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Company Typography",
+      "binLeft": "COMPANY_A",
+      "binRight": "COMPANY_B",
+      "showFontName": false,
+      "useCompanyPairs": true,
+      "items": [
+        {
+          "id": "company-1",
+          "fontName": "SF Pro Display",
+          "fontFamily": "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif",
+          "category": "apple",
+          "text": "Apple",
+          "fontWeight": "400",
+          "fontStyle": "normal",
+          "company": "Apple",
+          "pair": "google"
+        },
+        {
+          "id": "company-2",
+          "fontName": "Product Sans",
+          "fontFamily": "'Product Sans', sans-serif",
+          "category": "google",
+          "text": "Google",
+          "fontWeight": "400",
+          "fontStyle": "normal",
+          "company": "Google",
+          "pair": "apple"
+        },
+        {
+          "id": "company-3",
+          "fontName": "Segoe UI",
+          "fontFamily": "'Segoe UI', Tahoma, sans-serif",
+          "category": "microsoft",
+          "text": "Microsoft",
+          "fontWeight": "400",
+          "fontStyle": "normal",
+          "company": "Microsoft",
+          "pair": "ibm"
+        },
+        {
+          "id": "company-4",
+          "fontName": "IBM Plex Sans",
+          "fontFamily": "'IBM Plex Sans', sans-serif",
+          "category": "ibm",
+          "text": "IBM",
+          "fontWeight": "400",
+          "fontStyle": "normal",
+          "company": "IBM",
+          "pair": "microsoft"
+        },
+        {
+          "id": "company-5",
+          "fontName": "Netflix Sans",
+          "fontFamily": "'Netflix Sans', sans-serif",
+          "category": "netflix",
+          "text": "Netflix",
+          "fontWeight": "400",
+          "fontStyle": "normal",
+          "company": "Netflix",
+          "pair": "spotify"
+        },
+        {
+          "id": "company-6",
+          "fontName": "Circular",
+          "fontFamily": "'Circular', 'Helvetica Neue', sans-serif",
+          "category": "spotify",
+          "text": "Spotify",
+          "fontWeight": "400",
+          "fontStyle": "normal",
+          "company": "Spotify",
+          "pair": "netflix"
+        },
+        {
+          "id": "company-7",
+          "fontName": "Spencerian Script",
+          "fontFamily": "'Spencerian Script', cursive",
+          "category": "cocacola",
+          "text": "Coca-Cola",
+          "fontWeight": "400",
+          "fontStyle": "normal",
+          "company": "Coca-Cola",
+          "pair": "pepsi"
+        },
+        {
+          "id": "company-8",
+          "fontName": "Pepsi Modern",
+          "fontFamily": "'Pepsi Modern', sans-serif",
+          "category": "pepsi",
+          "text": "Pepsi",
+          "fontWeight": "400",
+          "fontStyle": "normal",
+          "company": "Pepsi",
+          "pair": "cocacola"
+        },
+        {
+          "id": "company-9",
+          "fontName": "Futura",
+          "fontFamily": "'Futura', sans-serif",
+          "category": "nike",
+          "text": "NIKE",
+          "fontWeight": "400",
+          "fontStyle": "normal",
+          "company": "Nike",
+          "pair": "adidas"
+        },
+        {
+          "id": "company-10",
+          "fontName": "Adineue",
+          "fontFamily": "'Adineue', sans-serif",
+          "category": "adidas",
+          "text": "adidas",
+          "fontWeight": "400",
+          "fontStyle": "normal",
+          "company": "Adidas",
+          "pair": "nike"
+        },
+        {
+          "id": "company-11",
+          "fontName": "Chanel",
+          "fontFamily": "'Chanel', serif",
+          "category": "chanel",
+          "text": "CHANEL",
+          "fontWeight": "400",
+          "fontStyle": "normal",
+          "company": "Chanel",
+          "pair": "gucci"
+        },
+        {
+          "id": "company-12",
+          "fontName": "Gucci Serif",
+          "fontFamily": "'Gucci Serif', serif",
+          "category": "gucci",
+          "text": "GUCCI",
+          "fontWeight": "400",
+          "fontStyle": "normal",
+          "company": "Gucci",
+          "pair": "chanel"
+        },
+        {
+          "id": "company-13",
+          "fontName": "BMW Type",
+          "fontFamily": "'BMW Type', sans-serif",
+          "category": "bmw",
+          "text": "BMW",
+          "fontWeight": "400",
+          "fontStyle": "normal",
+          "company": "BMW",
+          "pair": "mercedes"
+        },
+        {
+          "id": "company-14",
+          "fontName": "Corporate A",
+          "fontFamily": "'Corporate A', sans-serif",
+          "category": "mercedes",
+          "text": "Mercedes-Benz",
+          "fontWeight": "400",
+          "fontStyle": "normal",
+          "company": "Mercedes-Benz",
+          "pair": "bmw"
+        },
+        {
+          "id": "company-15",
+          "fontName": "Sodo Sans",
+          "fontFamily": "'Sodo Sans', sans-serif",
+          "category": "starbucks",
+          "text": "Starbucks",
+          "fontWeight": "400",
+          "fontStyle": "normal",
+          "company": "Starbucks",
+          "pair": "dunkin"
+        },
+        {
+          "id": "company-16",
+          "fontName": "Frankfurter",
+          "fontFamily": "'Frankfurter', sans-serif",
+          "category": "dunkin",
+          "text": "Dunkin'",
+          "fontWeight": "400",
+          "fontStyle": "normal",
+          "company": "Dunkin'",
+          "pair": "starbucks"
+        },
+        {
+          "id": "company-17",
+          "fontName": "Gotham",
+          "fontFamily": "'Gotham', sans-serif",
+          "category": "tesla",
+          "text": "TESLA",
+          "fontWeight": "400",
+          "fontStyle": "normal",
+          "company": "Tesla",
+          "pair": "rivian"
+        },
+        {
+          "id": "company-18",
+          "fontName": "Rivian Sans",
+          "fontFamily": "'Rivian Sans', sans-serif",
+          "category": "rivian",
+          "text": "RIVIAN",
+          "fontWeight": "400",
+          "fontStyle": "normal",
+          "company": "Rivian",
+          "pair": "tesla"
+        },
+        {
+          "id": "company-19",
+          "fontName": "McDonald's Font",
+          "fontFamily": "'McDonald's Font', sans-serif",
+          "category": "mcdonalds",
+          "text": "McDonald's",
+          "fontWeight": "400",
+          "fontStyle": "normal",
+          "company": "McDonald's",
+          "pair": "burgerking"
+        },
+        {
+          "id": "company-20",
+          "fontName": "Flame",
+          "fontFamily": "'Flame', sans-serif",
+          "category": "burgerking",
+          "text": "BURGER KING",
+          "fontWeight": "400",
+          "fontStyle": "normal",
+          "company": "Burger King",
+          "pair": "mcdonalds"
+        }
+      ],
+      "pairs": [
+        {
+          "left": "Apple",
+          "right": "Google",
+          "leftFont": "SF Pro Display",
+          "rightFont": "Product Sans",
+          "leftText": "Apple",
+          "rightText": "Google",
+          "leftFontFamily": "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif",
+          "rightFontFamily": "'Product Sans', sans-serif"
+        },
+        {
+          "left": "Microsoft",
+          "right": "IBM",
+          "leftFont": "Segoe UI",
+          "rightFont": "IBM Plex Sans",
+          "leftText": "Microsoft",
+          "rightText": "IBM",
+          "leftFontFamily": "'Segoe UI', Tahoma, sans-serif",
+          "rightFontFamily": "'IBM Plex Sans', sans-serif"
+        },
+        {
+          "left": "Netflix",
+          "right": "Spotify",
+          "leftFont": "Netflix Sans",
+          "rightFont": "Circular",
+          "leftText": "Netflix",
+          "rightText": "Spotify",
+          "leftFontFamily": "'Netflix Sans', sans-serif",
+          "rightFontFamily": "'Circular', 'Helvetica Neue', sans-serif"
+        },
+        {
+          "left": "Coca-Cola",
+          "right": "Pepsi",
+          "leftFont": "Spencerian Script",
+          "rightFont": "Pepsi Modern",
+          "leftText": "Coca-Cola",
+          "rightText": "Pepsi",
+          "leftFontFamily": "'Spencerian Script', cursive",
+          "rightFontFamily": "'Pepsi Modern', sans-serif"
+        },
+        {
+          "left": "Nike",
+          "right": "Adidas",
+          "leftFont": "Futura",
+          "rightFont": "Adineue",
+          "leftText": "NIKE",
+          "rightText": "adidas",
+          "leftFontFamily": "'Futura', sans-serif",
+          "rightFontFamily": "'Adineue', sans-serif"
+        },
+        {
+          "left": "Chanel",
+          "right": "Gucci",
+          "leftFont": "Chanel",
+          "rightFont": "Gucci Serif",
+          "leftText": "CHANEL",
+          "rightText": "GUCCI",
+          "leftFontFamily": "'Chanel', serif",
+          "rightFontFamily": "'Gucci Serif', serif"
+        },
+        {
+          "left": "BMW",
+          "right": "Mercedes-Benz",
+          "leftFont": "BMW Type",
+          "rightFont": "Corporate A",
+          "leftText": "BMW",
+          "rightText": "Mercedes-Benz",
+          "leftFontFamily": "'BMW Type', sans-serif",
+          "rightFontFamily": "'Corporate A', sans-serif"
+        },
+        {
+          "left": "Starbucks",
+          "right": "Dunkin'",
+          "leftFont": "Sodo Sans",
+          "rightFont": "Frankfurter",
+          "leftText": "Starbucks",
+          "rightText": "Dunkin'",
+          "leftFontFamily": "'Sodo Sans', sans-serif",
+          "rightFontFamily": "'Frankfurter', sans-serif"
+        },
+        {
+          "left": "Tesla",
+          "right": "Rivian",
+          "leftFont": "Gotham",
+          "rightFont": "Rivian Sans",
+          "leftText": "TESLA",
+          "rightText": "RIVIAN",
+          "leftFontFamily": "'Gotham', sans-serif",
+          "rightFontFamily": "'Rivian Sans', sans-serif"
+        },
+        {
+          "left": "McDonald's",
+          "right": "Burger King",
+          "leftFont": "McDonald's Font",
+          "rightFont": "Flame",
+          "leftText": "McDonald's",
+          "rightText": "BURGER KING",
+          "leftFontFamily": "'McDonald's Font', sans-serif",
+          "rightFontFamily": "'Flame', sans-serif"
+        }
+      ]
+    },
+    
+    {
+      "id": 6,
+      "name": "Geographic Origin",
+      "binLeft": "SWISS/GERMAN",
+      "binRight": "AMERICAN",
+      "showFontName": true,
+      "useCompanyPairs": false,
+      "items": [
+        {
+          "id": "swiss-1",
+          "fontName": "Helvetica",
+          "fontFamily": "Helvetica, Arial, sans-serif",
+          "category": "swiss",
+          "text": "Design",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "swiss-2",
+          "fontName": "Univers",
+          "fontFamily": "Univers, sans-serif",
+          "category": "swiss",
+          "text": "Typography",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "swiss-3",
+          "fontName": "Frutiger",
+          "fontFamily": "Frutiger, sans-serif",
+          "category": "swiss",
+          "text": "Font",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "german-1",
+          "fontName": "Futura",
+          "fontFamily": "Futura, sans-serif",
+          "category": "swiss",
+          "text": "Design",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "german-2",
+          "fontName": "Akzidenz Grotesk",
+          "fontFamily": "'Akzidenz Grotesk', sans-serif",
+          "category": "swiss",
+          "text": "Typography",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "german-3",
+          "fontName": "FF Meta",
+          "fontFamily": "'FF Meta', sans-serif",
+          "category": "swiss",
+          "text": "Font",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "american-1",
+          "fontName": "Gotham",
+          "fontFamily": "Gotham, sans-serif",
+          "category": "american",
+          "text": "Design",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "american-2",
+          "fontName": "Proxima Nova",
+          "fontFamily": "Proxima Nova, sans-serif",
+          "category": "american",
+          "text": "Typography",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "american-3",
+          "fontName": "Inter",
+          "fontFamily": "Inter, sans-serif",
+          "category": "american",
+          "text": "Font",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "american-4",
+          "fontName": "Arial",
+          "fontFamily": "Arial, sans-serif",
+          "category": "american",
+          "text": "Design",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "american-5",
+          "fontName": "Gill Sans",
+          "fontFamily": "Gill Sans, sans-serif",
+          "category": "american",
+          "text": "Typography",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        },
+        {
+          "id": "american-6",
+          "fontName": "Franklin Gothic",
+          "fontFamily": "'Franklin Gothic', sans-serif",
+          "category": "american",
+          "text": "Font",
+          "fontWeight": "400",
+          "fontStyle": "normal"
+        }
+      ]
+    }
+  ],
+  "fonts": {
+    "serif": [
+      "Times New Roman",
+      "Georgia",
+      "Garamond",
+      "Baskerville",
+      "Caslon",
+      "Bodoni",
+      "Didot",
+      "Minion Pro",
+      "Palatino",
+      "Trajan Pro"
+    ],
+    "sans-serif": [
+      "Helvetica",
+      "Arial",
+      "Futura",
+      "Gotham",
+      "Proxima Nova",
+      "Montserrat",
+      "Open Sans",
+      "Roboto",
+      "Inter",
+      "Gill Sans"
+    ],
+    "2000s": [
+      "Comic Sans MS",
+      "Papyrus",
+      "Impact",
+      "Arial Black",
+      "Verdana",
+      "Trebuchet MS",
+      "Tahoma",
+      "Lucida Grande",
+      "Myriad Pro",
+      "Frutiger"
+    ],
+    "2020s": [
+      "Inter",
+      "Poppins",
+      "DM Sans",
+      "Space Grotesk",
+      "Manrope",
+      "Outfit",
+      "Plus Jakarta Sans",
+      "Work Sans",
+      "Sora",
+      "Geist"
+    ]
+  }
+}

@@ -9,6 +9,7 @@ yarn-error.log*
 .vscode
 .idea
 data/
+!src/data/
 swag/
 gcloud-storage-admin-key.json
 games-activation.json

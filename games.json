@@ -5,16 +5,7 @@
       "name": "snowflake",
       "title": "❄️ Snowflake Tapper",
       "description": "Tap snowflakes before they hit the ground!",
-      "path": "/snowflake",
-      "activated": false
-    },
-    {
-      "code": "SNOWFLAKE2024TEST",
-      "name": "snowflake-test",
-      "title": "❄️ Snowflake Tapper (Test)",
-      "description": "Tap snowflakes before they hit the ground!",
-      "path": "/snowflake",
-      "activated": false
+      "path": "/snowflake"
     },
     {
       "code": "FLAPPYBIRD2024",
@@ -22,7 +13,15 @@
       "title": "🐦 Family Flappy Bird",
       "description": "Choose your character and fly through obstacles!",
       "path": "/flappybird",
-      "activated": false
+      "activated": true
+    },
+    {
+      "code": "TYPOGRAPHY2024",
+      "name": "typography",
+      "title": "🔤 Typography Sorter",
+      "description": "Swipe left or right to sort typography samples!",
+      "path": "/typography",
+      "activated": true
     }
   ]
 }

@@ -18,6 +18,9 @@ function GameOver({ finalScore, onRestart, mode = 'gameOver', gameName = 'snowfl
     if (gameName === 'flappybird') {
       return "Choose your character and fly through obstacles! Tap or click to go up. Avoid hitting the obstacles. Do not fall! Score increases every second. Speed increases by 10% every 10 seconds!";
     }
+    if (gameName === 'typography') {
+      return "Swipe left or right to sort typography samples into the correct bins! Progress through 6 levels of increasing difficulty. You have 3 mistakes before game over.";
+    }
     return "";
   };
 
@@ -25,7 +28,11 @@ function GameOver({ finalScore, onRestart, mode = 'gameOver', gameName = 'snowfl
     <div className="game-over">
       {isStart ? (
         <>
-          <h2>{gameName === 'flappybird' ? 'Family Flappy Bird' : 'Designer Snowflake Tapper'}</h2>
+          <h2>
+            {gameName === 'flappybird' ? 'Family Flappy Bird' : 
+             gameName === 'typography' ? 'Typography Sorter' : 
+             'Designer Snowflake Tapper'}
+          </h2>
           <p className="instructions">{getInstructions()}</p>
           <button onClick={onRestart}>Start Game</button>
         </>
@@ -35,6 +42,8 @@ function GameOver({ finalScore, onRestart, mode = 'gameOver', gameName = 'snowfl
           <p>
             {gameName === 'flappybird' 
               ? `You scored ${finalScore} points!`
+              : gameName === 'typography'
+              ? `You sorted ${finalScore} typography samples correctly!`
               : `You caught ${finalScore} snowflakes!`}
           </p>
           

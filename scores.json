@@ -1,9 +1,90 @@
 {
-  "snowflake": [
+  "snowflake": [],
+  "flappybird": [
     {
       "username": "Sebastian",
-      "flakes": 92,
-      "timestamp": "2025-11-19T20:09:20.049Z"
+      "flakes": 47,
+      "timestamp": "2025-11-22T21:18:21.062Z"
+    },
+    {
+      "username": "Sebastian",
+      "flakes": 41,
+      "timestamp": "2025-11-22T21:11:09.821Z"
+    },
+    {
+      "username": "Sebastian",
+      "flakes": 31,
+      "timestamp": "2025-11-22T21:14:46.336Z"
+    },
+    {
+      "username": "Sebastian",
+      "flakes": 21,
+      "timestamp": "2025-11-22T21:20:06.312Z"
+    },
+    {
+      "username": "Sebastian",
+      "flakes": 12,
+      "timestamp": "2025-11-22T21:10:09.002Z"
+    },
+    {
+      "username": "Sebastian",
+      "flakes": 11,
+      "timestamp": "2025-11-22T21:05:23.648Z"
+    },
+    {
+      "username": "Sebastian",
+      "flakes": 10,
+      "timestamp": "2025-11-22T21:15:37.842Z"
+    },
+    {
+      "username": "Sebastian",
+      "flakes": 9,
+      "timestamp": "2025-11-22T20:45:35.722Z"
+    },
+    {
+      "username": "Sebastian",
+      "flakes": 7,
+      "timestamp": "2025-11-22T21:10:29.132Z"
+    },
+    {
+      "username": "Sebastian",
+      "flakes": 5,
+      "timestamp": "2025-11-22T20:51:31.505Z"
+    },
+    {
+      "username": "Sebastian",
+      "flakes": 5,
+      "timestamp": "2025-11-22T21:00:18.637Z"
+    },
+    {
+      "username": "Sebastian",
+      "flakes": 5,
+      "timestamp": "2025-11-22T21:16:11.642Z"
+    },
+    {
+      "username": "Sebastian",
+      "flakes": 3,
+      "timestamp": "2025-11-22T21:00:02.407Z"
+    },
+    {
+      "username": "Sebastian",
+      "flakes": 3,
+      "timestamp": "2025-11-22T21:15:54.777Z"
+    },
+    {
+      "username": "Sebastian",
+      "flakes": 2,
+      "timestamp": "2025-11-22T20:44:19.745Z"
+    },
+    {
+      "username": "Sebastian",
+      "flakes": 2,
+      "timestamp": "2025-11-22T20:49:36.958Z"
+    },
+    {
+      "username": "Sebastian",
+      "flakes": 2,
+      "timestamp": "2025-11-22T20:52:38.854Z"
     }
   ]
 }
