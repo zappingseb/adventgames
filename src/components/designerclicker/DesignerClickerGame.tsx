@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useDesignerClickerState } from '../../hooks/useDesignerClickerState';
 import { LEVELS, DESIGNERS, getDesignerCost, getDesignerRate } from '../../constants/designerClickerConstants';
 import DesignerClickerOnboarding, { DesignerClickerOnboardingRef } from './DesignerClickerOnboarding';
+import GameOver from '../game/GameOver';
 import './DesignerClickerGame.css';
 
 interface DesignerClickerGameProps {
@@ -16,9 +17,12 @@ function DesignerClickerGame({ onBack }: DesignerClickerGameProps) {
     ownedDesigners,
     clickPower,
     passiveRate,
+    gameOver,
+    finalScore,
     handleClick,
     purchaseDesigner,
     endGame,
+    restartGame,
   } = useDesignerClickerState();
 
   const [clickAnimation, setClickAnimation] = useState<{ x: number; y: number; id: number }[]>([]);
@@ -128,6 +132,16 @@ function DesignerClickerGame({ onBack }: DesignerClickerGameProps) {
     setSelectedDesigner(null);
   };
 
+  if (gameOver) {
+    return (
+      <GameOver
+        finalScore={Math.floor(finalScore)}
+        onRestart={restartGame}
+        mode="gameOver"
+        gameName="designerclicker"
+      />
+    );
+  }
 
   return (
     <div 

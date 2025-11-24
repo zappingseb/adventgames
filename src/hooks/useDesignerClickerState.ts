@@ -8,6 +8,7 @@ export interface DesignerClickerState {
   ownedDesigners: { [key: string]: number };
   clickPower: number;
   passiveRate: number;
+  gameOver: boolean;
 }
 
 export function useDesignerClickerState() {
@@ -17,6 +18,8 @@ export function useDesignerClickerState() {
   const [ownedDesigners, setOwnedDesigners] = useState<{ [key: string]: number }>({});
   const [clickPower, setClickPower] = useState(1);
   const [passiveRate, setPassiveRate] = useState(0);
+  const [gameOver, setGameOver] = useState(false);
+  const [finalScore, setFinalScore] = useState(0);
   const lastUpdateRef = useRef<number>(Date.now());
   const lastPurchaseRef = useRef<{ [key: string]: number }>({});
 
@@ -78,9 +81,14 @@ export function useDesignerClickerState() {
   }, [clickPower, ownedDesigners]);
 
   const handleClick = useCallback(() => {
+    if (gameOver) return; // Don't allow clicks when game is over
     setInspiration((prev) => prev + effectiveClickPower);
     
-  }, [effectiveClickPower, ownedDesigners]);
+    // Coco Chanel generates Style on click
+    if (ownedDesigners.chanel) {
+      setStyle((prev) => prev + ownedDesigners.chanel);
+    }
+  }, [effectiveClickPower, ownedDesigners, gameOver]);
 
   const purchaseDesigner = useCallback((designerId: string, cost: number) => {
     console.log('purchaseDesigner', designerId, cost);
@@ -133,7 +141,7 @@ export function useDesignerClickerState() {
     }
   }, [inspiration, level]);
 
-  const endGame = useCallback(async (finalScore: number) => {
+  const endGame = useCallback(async (score: number) => {
     // Submit score to backend
     const username = localStorage.getItem('username');
     if (username) {
@@ -145,7 +153,7 @@ export function useDesignerClickerState() {
           },
           body: JSON.stringify({
             username,
-            flakes: Math.floor(finalScore),
+            flakes: Math.floor(score),
           }),
         });
       } catch (error) {
@@ -153,13 +161,20 @@ export function useDesignerClickerState() {
       }
     }
     
+    // Set game over state and save final score
+    setFinalScore(score);
+    setGameOver(true);
+  }, []);
+
+  const restartGame = useCallback(() => {
     // Reset all game state
     setInspiration(0);
     setStyle(0);
     setLevel(1);
     setOwnedDesigners({});
     setClickPower(1);
-
+    setGameOver(false);
+    setFinalScore(0);
     lastUpdateRef.current = Date.now();
     lastPurchaseRef.current = {};
   }, []);
@@ -171,9 +186,12 @@ export function useDesignerClickerState() {
     ownedDesigners,
     clickPower: effectiveClickPower,
     passiveRate,
+    gameOver,
+    finalScore,
     handleClick,
     purchaseDesigner,
     endGame,
+    restartGame,
     setInspiration,
   };
 }

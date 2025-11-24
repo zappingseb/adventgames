@@ -21,6 +21,9 @@ function GameOver({ finalScore, onRestart, mode = 'gameOver', gameName = 'snowfl
     if (gameName === 'typography') {
       return "Swipe left or right to sort typography samples into the correct bins! Progress through 6 levels of increasing difficulty. You have 3 mistakes before game over.";
     }
+    if (gameName === 'designerclicker') {
+      return "Click to design and earn Inspiration Points! Unlock designers to help you generate more IP. Reach max level and submit your score!";
+    }
     return "";
   };
 
@@ -31,6 +34,7 @@ function GameOver({ finalScore, onRestart, mode = 'gameOver', gameName = 'snowfl
           <h2>
             {gameName === 'flappybird' ? 'Family Flappy Bird' : 
              gameName === 'typography' ? 'Typography Sorter' : 
+             gameName === 'designerclicker' ? 'Designer Clicker' :
              'Designer Snowflake Tapper'}
           </h2>
           <p className="instructions">{getInstructions()}</p>
@@ -44,6 +48,8 @@ function GameOver({ finalScore, onRestart, mode = 'gameOver', gameName = 'snowfl
               ? `You scored ${finalScore} points!`
               : gameName === 'typography'
               ? `You sorted ${finalScore} typography samples correctly!`
+              : gameName === 'designerclicker'
+              ? `You earned ${finalScore.toLocaleString()} Inspiration Points!`
               : `You caught ${finalScore} snowflakes!`}
           </p>
           
