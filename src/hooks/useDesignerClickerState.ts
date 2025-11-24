@@ -80,10 +80,6 @@ export function useDesignerClickerState() {
   const handleClick = useCallback(() => {
     setInspiration((prev) => prev + effectiveClickPower);
     
-    // Coco Chanel generates Style on click
-    if (ownedDesigners.chanel) {
-      setStyle((prev) => prev + ownedDesigners.chanel);
-    }
   }, [effectiveClickPower, ownedDesigners]);
 
   const purchaseDesigner = useCallback((designerId: string, cost: number) => {
@@ -163,7 +159,7 @@ export function useDesignerClickerState() {
     setLevel(1);
     setOwnedDesigners({});
     setClickPower(1);
-    
+
     lastUpdateRef.current = Date.now();
     lastPurchaseRef.current = {};
   }, []);
