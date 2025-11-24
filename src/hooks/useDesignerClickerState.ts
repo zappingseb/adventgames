@@ -13,8 +13,7 @@ export interface DesignerClickerState {
 
 export function useDesignerClickerState() {
   const [inspiration, setInspiration] = useState(0);
-  const [style, setStyle] = useState(0);
-  const [level, setLevel] = useState(1);
+  const [level , setLevel] = useState(1);
   const [ownedDesigners, setOwnedDesigners] = useState<{ [key: string]: number }>({});
   const [clickPower, setClickPower] = useState(1);
   const [passiveRate, setPassiveRate] = useState(0);
@@ -84,10 +83,6 @@ export function useDesignerClickerState() {
     if (gameOver) return; // Don't allow clicks when game is over
     setInspiration((prev) => prev + effectiveClickPower);
     
-    // Coco Chanel generates Style on click
-    if (ownedDesigners.chanel) {
-      setStyle((prev) => prev + ownedDesigners.chanel);
-    }
   }, [effectiveClickPower, ownedDesigners, gameOver]);
 
   const purchaseDesigner = useCallback((designerId: string, cost: number) => {
@@ -110,6 +105,15 @@ export function useDesignerClickerState() {
     // Record this purchase attempt
     lastPurchaseRef.current[designerId] = now;
     
+    // Check purchase limit
+    const designer = DESIGNERS.find(d => d.id === designerId);
+    if (designer?.maxOwned !== undefined) {
+      const currentOwned = ownedDesigners[designerId] || 0;
+      if (currentOwned >= designer.maxOwned) {
+        return; // Already at max, don't allow purchase
+      }
+    }
+    
     // Use functional updates to get latest state
     setInspiration((prevInspiration) => {
       // Check if we can afford it
@@ -123,12 +127,16 @@ export function useDesignerClickerState() {
     // Update owned designers - this will only happen once per purchase
     return setOwnedDesigners((prevOwned) => {
         const currentOwned = prevOwned[designerId] || 0;
+        // Double-check limit before incrementing
+        if (designer?.maxOwned !== undefined && currentOwned >= designer.maxOwned) {
+          return prevOwned; // Don't increment if at max
+        }
         return {
           ...prevOwned,
           [designerId]: currentOwned + 1,
         };
       });
-  }, []);
+  }, [ownedDesigners]);
 
   // Check for level ups whenever inspiration changes
   useEffect(() => {
@@ -169,7 +177,6 @@ export function useDesignerClickerState() {
   const restartGame = useCallback(() => {
     // Reset all game state
     setInspiration(0);
-    setStyle(0);
     setLevel(1);
     setOwnedDesigners({});
     setClickPower(1);
@@ -181,7 +188,6 @@ export function useDesignerClickerState() {
 
   return {
     inspiration,
-    style,
     level,
     ownedDesigners,
     clickPower: effectiveClickPower,

@@ -6,6 +6,7 @@ export interface Designer {
   cost: number;
   clickRate?: number; // Click power multiplier per unit (e.g., 2 = doubles click power)
   bonusCondition?: () => number; // Returns bonus multiplier
+  maxOwned?: number; // Maximum number of this designer that can be owned (undefined = unlimited)
 }
 
 export interface Level {
@@ -74,6 +75,7 @@ export const DESIGNERS: Designer[] = [
     baseRate: 0,
     cost: 100,
     clickRate: 2,
+    maxOwned: 2,
     bonusCondition: () => 1.0,
   },
   {
@@ -120,6 +122,7 @@ export const DESIGNERS: Designer[] = [
     baseRate: 0,
     cost: 1000,
     clickRate: 4,
+    maxOwned: 1,
     bonusCondition: () => 1.0,
   },
 ];

@@ -1,7 +1,8 @@
 import { useEffect, useState, useRef } from 'react';
 import { useDesignerClickerState } from '../../hooks/useDesignerClickerState';
-import { LEVELS, DESIGNERS, getDesignerCost, getDesignerRate } from '../../constants/designerClickerConstants';
+import { LEVELS, DESIGNERS } from '../../constants/designerClickerConstants';
 import DesignerClickerOnboarding, { DesignerClickerOnboardingRef } from './DesignerClickerOnboarding';
+import DesignerList from './DesignerList';
 import GameOver from '../game/GameOver';
 import './DesignerClickerGame.css';
 
@@ -12,7 +13,6 @@ interface DesignerClickerGameProps {
 function DesignerClickerGame({ onBack }: DesignerClickerGameProps) {
   const {
     inspiration,
-    style,
     level,
     ownedDesigners,
     clickPower,
@@ -156,12 +156,6 @@ function DesignerClickerGame({ onBack }: DesignerClickerGameProps) {
             <span className="stat-label">Inspiration:</span>
             <span className="stat-value">{displayedInspiration.toLocaleString()}</span>
           </div>
-          {style > 0 && (
-            <div className="stat">
-              <span className="stat-label">Style:</span>
-              <span className="stat-value">{Math.floor(style).toLocaleString()}</span>
-            </div>
-          )}
           <div className="stat">
             <span className="stat-label">Level {level}:</span>
             <span className="stat-value">{currentLevel.name}</span>
@@ -242,77 +236,15 @@ function DesignerClickerGame({ onBack }: DesignerClickerGameProps) {
         )}
       </div>
 
-      <div className="upgrades-sidebar" id="onboarding-target-sidebar">
-        {DESIGNERS.map((designer) => {
-          const owned = ownedDesigners[designer.id] || 0;
-          const cost = getDesignerCost(designer.cost, owned);
-          const isMonochrome = document.body.classList.contains('monochrome-gray');
-          const rate = getDesignerRate(designer.id, designer.baseRate, owned, batteryBonus, isMonochrome);
-          const canAfford = inspiration >= cost;
-          const isSelected = selectedDesigner === designer.id;
-
-          return (
-            <div key={designer.id} style={{ position: 'relative' }}>
-              <div 
-                className={`upgrade-icon ${canAfford ? 'affordable' : 'disabled'} ${owned > 0 ? 'owned' : ''}`}
-                onClick={(e) => handleDesignerClick(e, designer.id)}
-              >
-                <img 
-                  src={`/designers/${designer.id}.png`}
-                  alt={designer.name}
-                  className="upgrade-icon-image"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = 'none';
-                  }}
-                />
-                {owned > 0 && <span className="upgrade-count">{owned}</span>}
-              </div>
-              {isSelected && (
-                <div className="designer-details-popup" onClick={(e) => e.stopPropagation()}>
-                  <h4>{designer.name}</h4>
-                  <p className="designer-details-title">{designer.title}</p>
-                  <div className="designer-details-stats">
-                    {designer.clickRate ? (
-                      <div className="designer-detail-item">
-                        <span className="detail-label">Effect:</span>
-                        <span className="detail-value">×{designer.clickRate} Click Power per unit</span>
-                      </div>
-                    ) : (
-                      <div className="designer-detail-item">
-                        <span className="detail-label">Speed:</span>
-                        <span className="detail-value">+{rate > 0 ? rate.toFixed(1) : designer.baseRate} IP/s</span>
-                      </div>
-                    )}
-                    <div className="designer-detail-item">
-                      <span className="detail-label">Price:</span>
-                      <span className="detail-value">{cost.toLocaleString()} IP</span>
-                    </div>
-                    {owned > 0 && (
-                      <div className="designer-detail-item">
-                        <span className="detail-label">Owned:</span>
-                        <span className="detail-value">{owned}</span>
-                      </div>
-                    )}
-                  </div>
-                  {canAfford && (
-                    <button 
-                      className="designer-purchase-btn"
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        e.preventDefault();
-                        purchaseDesigner(designer.id, cost);
-                      }}
-                    >
-                      Buy Now
-                    </button>
-                  )}
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
+      <DesignerList
+        designers={DESIGNERS}
+        ownedDesigners={ownedDesigners}
+        inspiration={inspiration}
+        batteryBonus={batteryBonus}
+        selectedDesigner={selectedDesigner}
+        onDesignerClick={handleDesignerClick}
+        onPurchase={purchaseDesigner}
+      />
     </div>
   );
 }
