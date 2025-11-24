@@ -21,6 +21,7 @@ function DesignerClickerGame({ onBack }: DesignerClickerGameProps) {
     finalScore,
     handleClick,
     purchaseDesigner,
+    saveScore,
     endGame,
     restartGame,
   } = useDesignerClickerState();
@@ -132,6 +133,14 @@ function DesignerClickerGame({ onBack }: DesignerClickerGameProps) {
     setSelectedDesigner(null);
   };
 
+  const handleBack = async () => {
+    // Save score before navigating away (without ending the game)
+    if (inspiration > 0) {
+      await saveScore(inspiration);
+    }
+    onBack();
+  };
+
   if (gameOver) {
     return (
       <GameOver
@@ -150,7 +159,7 @@ function DesignerClickerGame({ onBack }: DesignerClickerGameProps) {
     >
       <DesignerClickerOnboarding ref={onboardingRef} />
       <div className="designer-header" id="onboarding-target-top">
-        <button className="back-button" onClick={onBack}>← Back</button>
+        <button className="back-button" onClick={handleBack}>← Back</button>
         <div className="stats">
           <div className="stat">
             <span className="stat-label">Inspiration:</span>

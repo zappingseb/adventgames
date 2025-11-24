@@ -149,10 +149,10 @@ export function useDesignerClickerState() {
     }
   }, [inspiration, level]);
 
-  const endGame = useCallback(async (score: number) => {
-    // Submit score to backend
+  const saveScore = useCallback(async (score: number) => {
+    // Submit score to backend without ending the game
     const username = localStorage.getItem('username');
-    if (username) {
+    if (username && score > 0) {
       try {
         await fetch('/api/scores/designerclicker', {
           method: 'POST',
@@ -168,6 +168,10 @@ export function useDesignerClickerState() {
         console.error('Failed to save score:', error);
       }
     }
+  }, []);
+
+  const endGame = useCallback(async (score: number) => {
+    saveScore(score);
     
     // Set game over state and save final score
     setFinalScore(score);
@@ -196,6 +200,7 @@ export function useDesignerClickerState() {
     finalScore,
     handleClick,
     purchaseDesigner,
+    saveScore,
     endGame,
     restartGame,
     setInspiration,
