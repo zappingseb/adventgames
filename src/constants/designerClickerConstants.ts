@@ -75,7 +75,7 @@ export const DESIGNERS: Designer[] = [
     baseRate: 0,
     cost: 100,
     clickRate: 2,
-    maxOwned: 2,
+    maxOwned: 3,
     bonusCondition: () => 1.0,
   },
   {
@@ -122,7 +122,7 @@ export const DESIGNERS: Designer[] = [
     baseRate: 0,
     cost: 1000,
     clickRate: 4,
-    maxOwned: 1,
+    maxOwned: 2,
     bonusCondition: () => 1.0,
   },
 ];
