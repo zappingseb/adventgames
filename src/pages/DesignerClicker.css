@@ -1,5 +1,9 @@
 .designer-clicker-page {
   width: 100%;
   min-height: 100vh;
+  min-height: -webkit-fill-available; /* iOS Safari fix */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  touch-action: pan-y; /* Allow vertical scrolling */
 }
 
