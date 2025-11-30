@@ -93,7 +93,7 @@ function Home() {
 
   return (
     <div className="home-container">
-      <h1>❄️ Advent Games</h1>
+      <h1>❄️ Liv's Advent of games & Quatsch</h1>
       <UsernameForm 
         initialUsername={username}
         onSubmit={handleUsernameSubmit}
