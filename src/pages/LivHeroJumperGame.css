@@ -1,0 +1,47 @@
+.liv-hero-jumper-page {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #1a1a1a;
+  overflow: hidden;
+}
+
+.game-area-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.start-prompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.start-prompt button {
+  padding: 15px 40px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.start-prompt button:hover {
+  background-color: #45a049;
+  transform: scale(1.05);
+}
+
+.start-prompt button:active {
+  transform: scale(0.95);
+}
+

@@ -24,6 +24,9 @@ function GameOver({ finalScore, onRestart, mode = 'gameOver', gameName = 'snowfl
     if (gameName === 'designerclicker') {
       return "Click to design and earn Inspiration Points! Unlock designers to help you generate more IP. Reach max level and submit your score!";
     }
+    if (gameName === 'livherojumper') {
+      return "Jump over gaps across three columns! Use buttons or swipe left/right to move between columns, and swipe up or press jump to jump over gaps. Complete all 10 levels!";
+    }
     return "";
   };
 
@@ -35,6 +38,7 @@ function GameOver({ finalScore, onRestart, mode = 'gameOver', gameName = 'snowfl
             {gameName === 'flappybird' ? 'Family Flappy Bird' : 
              gameName === 'typography' ? 'Typography Sorter' : 
              gameName === 'designerclicker' ? 'Designer Clicker' :
+             gameName === 'livherojumper' ? 'Liv Hero Jumper' :
              'Designer Snowflake Tapper'}
           </h2>
           <p className="instructions">{getInstructions()}</p>
@@ -50,6 +54,8 @@ function GameOver({ finalScore, onRestart, mode = 'gameOver', gameName = 'snowfl
               ? `You sorted ${finalScore ?? 0} typography samples correctly!`
               : gameName === 'designerclicker'
               ? `You earned ${(finalScore ?? 0).toLocaleString()} Inspiration Points!`
+              : gameName === 'livherojumper'
+              ? `You scored ${finalScore ?? 0} points!`
               : `You caught ${finalScore ?? 0} snowflakes!`}
           </p>
           
