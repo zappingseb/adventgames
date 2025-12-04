@@ -41,13 +41,25 @@ jobs:
       - name: Write service account key file
         run: |
           # Write the JSON key file from the secret
-          # Important: When pasting the JSON into GitHub Secrets, paste it EXACTLY as it appears in the file
-          # The private_key field must have \n characters (escaped newlines) - do NOT replace them with actual newlines
+          # CRITICAL: The secret must contain valid JSON with:
+          # - Double quotes around ALL property names and string values
+          # - The private_key field must have \n (backslash-n) characters, NOT actual newlines
+          # - No leading/trailing whitespace or special characters
           echo "${{ secrets.GCP_STORAGE_ADMIN_KEY }}" > gcloud-storage-admin-key.json
           # Remove any trailing newline that echo might add
           truncate -s -1 gcloud-storage-admin-key.json 2>/dev/null || true
-          # Verify the JSON is valid and show better error output
-          python3 -c "import json; json.load(open('gcloud-storage-admin-key.json'))" || (echo "=== JSON Validation Failed ===" && echo "File size: $(wc -c < gcloud-storage-admin-key.json) bytes" && echo "First 500 chars (hexdump):" && head -c 500 gcloud-storage-admin-key.json | od -c | head -20 && echo "First 500 chars (text):" && head -c 500 gcloud-storage-admin-key.json && exit 1)
+          # Check if file starts with { (valid JSON) or something else
+          FIRST_CHAR=$(head -c 1 gcloud-storage-admin-key.json)
+          if [ "$FIRST_CHAR" != "{" ]; then
+            echo "ERROR: File does not start with '{'. First char: '$FIRST_CHAR'"
+            echo "First 100 chars:"
+            head -c 100 gcloud-storage-admin-key.json
+            echo ""
+            echo "The GitHub Secret may be incorrectly formatted. It must be valid JSON starting with '{'"
+            exit 1
+          fi
+          # Verify the JSON is valid
+          python3 -c "import json; json.load(open('gcloud-storage-admin-key.json'))" || (echo "=== JSON Validation Failed ===" && echo "File size: $(wc -c < gcloud-storage-admin-key.json) bytes" && echo "First 200 chars:" && head -c 200 gcloud-storage-admin-key.json && echo "" && echo "Check that your GitHub Secret contains valid JSON with double quotes around all keys and values." && exit 1)
 
       - name: Write games.json from secret
         run: |
