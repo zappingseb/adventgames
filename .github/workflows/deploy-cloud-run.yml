@@ -40,7 +40,14 @@ jobs:
 
       - name: Write service account key file
         run: |
+          # Write the JSON key file from the secret
+          # Important: When pasting the JSON into GitHub Secrets, paste it EXACTLY as it appears in the file
+          # The private_key field must have \n characters (escaped newlines) - do NOT replace them with actual newlines
           echo "${{ secrets.GCP_STORAGE_ADMIN_KEY }}" > gcloud-storage-admin-key.json
+          # Remove any trailing newline that echo might add
+          truncate -s -1 gcloud-storage-admin-key.json 2>/dev/null || true
+          # Verify the JSON is valid
+          python3 -c "import json; json.load(open('gcloud-storage-admin-key.json'))" || (echo "Invalid JSON. First 200 chars:" && head -c 200 gcloud-storage-admin-key.json && exit 1)
 
       - name: Write games.json from secret
         run: |

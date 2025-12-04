@@ -70,8 +70,27 @@ async function initCloudStorage() {
         // In production, the key file MUST exist (it's written by GitHub Actions)
         // Fail hard if it doesn't exist rather than falling back to ADC
         await fs.access(keyFilePath);
-        const keyFileContents = await fs.readFile(keyFilePath, 'utf8');
-        const keyData = JSON.parse(keyFileContents);
+        let keyFileContents = await fs.readFile(keyFilePath, 'utf8');
+        
+        // Trim whitespace and newlines that might be added by echo in GitHub Actions
+        keyFileContents = keyFileContents.trim();
+        
+        let keyData;
+        try {
+          keyData = JSON.parse(keyFileContents);
+        } catch (parseError) {
+          // Log the first 200 chars to help debug (without exposing the full key)
+          const preview = keyFileContents.substring(0, 200);
+          logger.error({ 
+            keyFilePath,
+            parseError: parseError.message,
+            filePreview: preview,
+            fileLength: keyFileContents.length,
+            note: 'Failed to parse key file JSON. Check if the secret is properly formatted.'
+          }, 'Failed to parse service account key file');
+          throw new Error(`Invalid JSON in key file: ${parseError.message}`);
+        }
+        
         serviceAccountEmail = keyData.client_email || null;
         
         // Use keyFilename to ensure the private key is used directly
