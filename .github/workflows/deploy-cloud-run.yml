@@ -38,28 +38,23 @@ jobs:
         run: |
           gcloud auth configure-docker europe-west1-docker.pkg.dev --quiet
 
-      - name: Write service account key file
+      - name: Create service account key file
+        id: create-key-file
+        uses: jsdaniell/create-json@1.1.2
+        with:
+          name: "gcloud-storage-admin-key.json"
+          json: ${{ secrets.GCP_STORAGE_ADMIN_KEY }}
+
+      - name: Validate service account key file
         run: |
-          # Write the JSON key file from the secret
-          # CRITICAL: The secret must contain valid JSON with:
-          # - Double quotes around ALL property names and string values
-          # - The private_key field must have \n (backslash-n) characters, NOT actual newlines
-          # - No leading/trailing whitespace or special characters
-          echo "${{ secrets.GCP_STORAGE_ADMIN_KEY }}" > gcloud-storage-admin-key.json
-          # Remove any trailing newline that echo might add
-          truncate -s -1 gcloud-storage-admin-key.json 2>/dev/null || true
-          # Check if file starts with { (valid JSON) or something else
-          FIRST_CHAR=$(head -c 1 gcloud-storage-admin-key.json)
-          if [ "$FIRST_CHAR" != "{" ]; then
-            echo "ERROR: File does not start with '{'. First char: '$FIRST_CHAR'"
-            echo "First 100 chars:"
-            head -c 100 gcloud-storage-admin-key.json
-            echo ""
-            echo "The GitHub Secret may be incorrectly formatted. It must be valid JSON starting with '{'"
+          # Verify the JSON file exists and is valid
+          if [ ! -f gcloud-storage-admin-key.json ]; then
+            echo "ERROR: gcloud-storage-admin-key.json was not created"
             exit 1
           fi
-          # Verify the JSON is valid
-          python3 -c "import json; json.load(open('gcloud-storage-admin-key.json'))" || (echo "=== JSON Validation Failed ===" && echo "File size: $(wc -c < gcloud-storage-admin-key.json) bytes" && echo "First 200 chars:" && head -c 200 gcloud-storage-admin-key.json && echo "" && echo "Check that your GitHub Secret contains valid JSON with double quotes around all keys and values." && exit 1)
+          # Validate JSON structure and required fields
+          node -e "const fs = require('fs'); const data = JSON.parse(fs.readFileSync('gcloud-storage-admin-key.json', 'utf8')); if (!data.private_key || !data.client_email || !data.project_id) { throw new Error('Missing required fields: private_key, client_email, or project_id'); } console.log('✓ Service account key file is valid'); console.log('  Client email:', data.client_email); console.log('  Project ID:', data.project_id);"
+          echo "✓ Service account key file validated successfully"
 
       - name: Write games.json from secret
         run: |
