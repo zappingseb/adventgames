@@ -1,3 +1,5 @@
+import { getApiHeaders } from '../config/apiConfig';
+
 export interface LeaderboardEntry {
   username: string;
   flakes: number;
@@ -6,7 +8,9 @@ export interface LeaderboardEntry {
 
 export async function getLeaderboard(gameName: string): Promise<LeaderboardEntry[]> {
   try {
-    const response = await fetch(`/api/scores/${gameName}`);
+    const response = await fetch(`/api/scores/${gameName}`, {
+      headers: getApiHeaders(),
+    });
     if (!response.ok) {
       throw new Error(`Failed to fetch leaderboard: ${response.statusText}`);
     }

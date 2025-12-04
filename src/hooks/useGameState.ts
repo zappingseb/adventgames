@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef } from 'react';
+import { getApiHeaders } from '../config/apiConfig';
 
 export function useGameState() {
   const [score, setScore] = useState(0);
@@ -22,9 +23,7 @@ export function useGameState() {
       try {
         await fetch('/api/scores/snowflake', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: getApiHeaders(),
           body: JSON.stringify({
             username,
             flakes: score,

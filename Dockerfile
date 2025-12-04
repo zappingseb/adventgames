@@ -5,6 +5,10 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+# Accept API key as build argument
+ARG VITE_API_KEY
+ENV VITE_API_KEY=$VITE_API_KEY
+
 # Copy package files first for better layer caching
 COPY package*.json ./
 COPY tsconfig*.json ./
@@ -20,7 +24,7 @@ COPY index.html ./
 COPY public ./public
 COPY server.js ./
 
-# Build the React app
+# Build the React app (VITE_API_KEY will be available during build)
 RUN npm run build
 
 # Stage 2: Production runtime - minimal image

@@ -12,7 +12,8 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 const isDev = process.env.NODE_ENV !== 'production';
-const useCloudStorage = process.env.GCP_PROJECT && !isDev;
+const useCloudStorage = process.env.GCP_PROJECT && !isDev; // For scores and activations
+const useCloudStorageForImages = true; // Always try to use Cloud Storage for images if key file exists
 
 // Initialize logger
 // In production (Cloud Run), use JSON format for Cloud Logging
@@ -31,43 +32,76 @@ const logger = pino({
   } : {})
 });
 
-// Cloud Storage setup (only in production with GCP_PROJECT)
+// Cloud Storage setup
 let storage = null;
 let scoresBucket = null;
+let livImagesBucket = null;
 let serviceAccountEmail = null;
+let storageForImages = null;
 const SCORES_BUCKET_NAME = process.env.SCORES_BUCKET_NAME || 'adventgames-scores';
+const LIV_IMAGES_BUCKET_NAME = process.env.LIV_IMAGES_BUCKET_NAME || 'advent-game-runner';
 const SCORES_FILE_NAME = 'scores.json';
 const GAMES_ACTIVATION_FILE_NAME = 'games-activation.json';
 
 // Initialize Cloud Storage (called during startup)
 async function initCloudStorage() {
-  if (!useCloudStorage) {
-    return;
+  let keyFilePath = null;
+  let storageForImages = null;
+  
+  // For images: always try to use Cloud Storage if key file exists (even in dev)
+  // For scores/activations: only in production
+  if (!isDev) {
+    keyFilePath = '/app/gcloud-storage-admin-key.json';
+  } else {
+    // In development, check for key file at project root for images
+    const localKeyPath = path.join(__dirname, 'gcloud-storage-admin-key.json');
+    try {
+      await fs.access(localKeyPath);
+      keyFilePath = localKeyPath;
+      logger.info({ keyFilePath: localKeyPath }, 'Found local Cloud Storage key file for development');
+    } catch (fileError) {
+      logger.debug({ keyFilePath: localKeyPath }, 'Local Cloud Storage key file not found');
+    }
   }
   
   try {
-    // Read service account key from file (copied into Docker image during build)
-    const keyFilePath = '/app/gcloud-storage-admin-key.json';
-    
-    try {
-      // Verify the file exists
+    // Initialize storage for images (always if key file exists)
+    if (keyFilePath && useCloudStorageForImages) {
       await fs.access(keyFilePath);
-      // Read the key file to get the service account email
       const keyFileContents = await fs.readFile(keyFilePath, 'utf8');
       const keyData = JSON.parse(keyFileContents);
       serviceAccountEmail = keyData.client_email || null;
-      // Use keyFilename option - Storage client will read and parse the JSON file
-      storage = new Storage({ keyFilename: keyFilePath });
-      logger.info({ keyFilePath, serviceAccountEmail }, 'Initialized Cloud Storage with service account key');
-    } catch (fileError) {
-      // If file doesn't exist, use default credentials
-      logger.warn({ keyFilePath, error: fileError.message }, 'Service account key file not found, using default credentials');
-      storage = new Storage();
-      logger.info('Initialized Cloud Storage with default credentials');
+      storageForImages = new Storage({ keyFilename: keyFilePath });
+      logger.info({ keyFilePath, serviceAccountEmail }, 'Initialized Cloud Storage for images with service account key');
+      livImagesBucket = storageForImages.bucket(LIV_IMAGES_BUCKET_NAME);
+      logger.info({ livImagesBucket: LIV_IMAGES_BUCKET_NAME }, 'Initialized Liv images bucket');
     }
-    scoresBucket = storage.bucket(SCORES_BUCKET_NAME);
+    
+    // Initialize storage for scores/activations (only in production)
+    if (useCloudStorage) {
+      if (keyFilePath) {
+        storage = new Storage({ keyFilename: keyFilePath });
+        logger.info({ keyFilePath, serviceAccountEmail }, 'Initialized Cloud Storage for scores/activations with service account key');
+      } else {
+        storage = new Storage();
+        logger.info('Initialized Cloud Storage for scores/activations with default credentials');
+      }
+      scoresBucket = storage.bucket(SCORES_BUCKET_NAME);
+    } else {
+      logger.info('Using local filesystem for scores and activations (dev mode)');
+    }
   } catch (error) {
-    logger.warn({ error: error.message }, 'Failed to initialize Cloud Storage, falling back to local filesystem');
+    logger.error({ error: error.message, stack: error.stack }, 'Failed to initialize Cloud Storage');
+    if (!livImagesBucket && useCloudStorageForImages) {
+      logger.warn('Images will not be available');
+    }
+  }
+  
+  // Log final state
+  if (livImagesBucket) {
+    logger.info({ bucket: LIV_IMAGES_BUCKET_NAME }, 'Liv images bucket is ready');
+  } else {
+    logger.warn({ bucket: LIV_IMAGES_BUCKET_NAME, keyFileExists: !!keyFilePath }, 'Liv images bucket is NOT initialized');
   }
 }
 
@@ -76,6 +110,46 @@ const DATA_DIR = process.env.NODE_ENV === 'production'
   ? (process.env.GCP_PROJECT ? '/tmp' : path.join(__dirname, 'data'))
   : __dirname;
 const SCORES_FILE = path.join(DATA_DIR, 'scores.json');
+
+// API Key configuration
+// Read API key from environment variable, or generate a default one for development
+const API_KEY = process.env.API_KEY || (isDev ? 'dev-api-key-12345' : null);
+
+if (!API_KEY && !isDev) {
+  logger.warn('API_KEY environment variable not set. API endpoints will be unprotected!');
+}
+
+// API Key validation middleware
+function validateApiKey(req, res, next) {
+  // Skip validation in development if no API key is set
+  if (isDev && !API_KEY) {
+    logger.debug('Skipping API key validation in development (no API key set)');
+    return next();
+  }
+  
+  // Since middleware is already scoped to /api routes via app.use('/api', validateApiKey),
+  // we don't need to check the path again. All requests here are already /api routes.
+  
+  const providedKey = req.headers['x-api-key'];
+  
+  if (!providedKey) {
+    logger.warn({ 
+      path: req.path, 
+      ip: req.ip || req.connection.remoteAddress 
+    }, 'API request missing API key');
+    return res.status(401).json({ error: 'API key required' });
+  }
+  
+  if (providedKey !== API_KEY) {
+    logger.warn({ 
+      path: req.path, 
+      ip: req.ip || req.connection.remoteAddress 
+    }, 'API request with invalid API key');
+    return res.status(403).json({ error: 'Invalid API key' });
+  }
+  
+  next();
+}
 
 // Middleware
 app.use(bodyParser.json());
@@ -101,13 +175,16 @@ if (isDev) {
   app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, X-API-Key');
     if (req.method === 'OPTIONS') {
       return res.sendStatus(200);
     }
     next();
   });
 }
+
+// Apply API key validation to all API routes
+app.use('/api', validateApiKey);
 
 // Serve static files in production
 if (!isDev) {
@@ -131,7 +208,7 @@ async function initScores() {
       const file = scoresBucket.file(SCORES_FILE_NAME);
       const [exists] = await file.exists();
       if (!exists) {
-        const defaultScores = { snowflake: [], flappybird: [] };
+        const defaultScores = { snowflake: [], flappybird: [], livherojumper: [] };
         await file.save(JSON.stringify(defaultScores, null, 2), {
           contentType: 'application/json',
         });
@@ -154,7 +231,7 @@ async function initScoresLocal() {
     }
     await fs.access(SCORES_FILE);
   } catch {
-    await fs.writeFile(SCORES_FILE, JSON.stringify({ snowflake: [], flappybird: [] }, null, 2));
+    await fs.writeFile(SCORES_FILE, JSON.stringify({ snowflake: [], flappybird: [], livherojumper: [] }, null, 2));
   }
 }
 
@@ -170,7 +247,7 @@ async function readScores() {
       const file = scoresBucket.file(SCORES_FILE_NAME);
       const [exists] = await file.exists();
       if (!exists) {
-        return { snowflake: [], flappybird: [] };
+        return { snowflake: [], flappybird: [], livherojumper: [] };
       }
       const [contents] = await file.download();
       return JSON.parse(contents.toString());
@@ -187,7 +264,7 @@ async function readScoresLocal() {
     const data = await fs.readFile(SCORES_FILE, 'utf8');
     return JSON.parse(data);
   } catch (error) {
-    return { snowflake: [], flappybird: [] };
+    return { snowflake: [], flappybird: [], livherojumper: [] };
   }
 }
 
@@ -324,7 +401,7 @@ async function loadGames() {
       games = gamesData.games || [];
       logger.debug('Loaded games from local games.json (dev mode)');
     } catch (error) {
-      logger.warn({ error: error.message }, 'No games.json found locally');
+      logger.error({ error: error.message, stack: error.stack }, 'Failed to load games.json locally');
       games = [];
     }
   } else {
@@ -336,17 +413,22 @@ async function loadGames() {
       games = gamesData.games || [];
       logger.debug('Loaded games from games.json (production)');
     } catch (error) {
-      logger.warn({ error: error.message }, 'No games.json found in Docker image');
+      logger.error({ error: error.message, stack: error.stack }, 'Failed to load games.json in production');
       games = [];
     }
     
     // Merge with activation states from Cloud Storage
-    const activations = await readGameActivations();
-    games = games.map(game => {
-      // Use activation from Cloud Storage, default to false if not found
-      game.activated = activations[game.code] === true;
-      return game;
-    });
+    try {
+      const activations = await readGameActivations();
+      games = games.map(game => {
+        // Use activation from Cloud Storage, default to false if not found
+        game.activated = activations[game.code] === true;
+        return game;
+      });
+    } catch (error) {
+      logger.error({ error: error.message }, 'Failed to read game activations, using default (false)');
+      // Continue with games, all will have activated: false
+    }
   }
   
   return games;
@@ -407,7 +489,74 @@ app.get('/api/games', async (req, res) => {
     const gamesWithoutCode = (gamesData.games || []).map(({ code, ...game }) => game);
     res.json(gamesWithoutCode);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to read games' });
+    logger.error({ error: error.message, stack: error.stack }, 'Failed to read games');
+    res.status(500).json({ error: 'Failed to read games', details: error.message });
+  }
+});
+
+// API: Get Liv image signed URL
+app.get('/api/images/liv/:level', async (req, res) => {
+  try {
+    const level = req.params.level;
+    // Try .png first, then .jpg as fallback
+    const fileNamePng = `level_${level}.png`;
+    const fileNameJpg = `level_${level}.jpg`;
+    
+    if (!livImagesBucket) {
+      let keyFileExists = false;
+      try {
+        await fs.access(path.join(__dirname, 'gcloud-storage-admin-key.json'));
+        keyFileExists = true;
+      } catch (e) {
+        keyFileExists = false;
+      }
+      logger.warn({ 
+        bucket: LIV_IMAGES_BUCKET_NAME, 
+        storageExists: !!storage,
+        keyFileExists
+      }, 'Liv images bucket not initialized');
+      return res.status(503).json({ error: 'Image storage not available' });
+    }
+    
+    try {
+      // Try PNG first
+      let file = livImagesBucket.file(fileNamePng);
+      let [exists] = await file.exists();
+      let fileName = fileNamePng;
+      
+      // If PNG doesn't exist, try JPG
+      if (!exists) {
+        file = livImagesBucket.file(fileNameJpg);
+        [exists] = await file.exists();
+        fileName = fileNameJpg;
+      }
+      
+      if (!exists) {
+        logger.warn({ fileName, level, bucket: LIV_IMAGES_BUCKET_NAME }, 'Image file not found in bucket');
+        return res.status(404).json({ error: 'Image not found' });
+      }
+      
+      // Generate signed URL that expires in 1 hour
+      const [url] = await file.getSignedUrl({
+        action: 'read',
+        expires: Date.now() + 3600000, // 1 hour
+      });
+      
+      logger.info({ fileName, level, bucket: LIV_IMAGES_BUCKET_NAME }, 'Generated signed URL for Liv image');
+      res.json({ url });
+    } catch (error) {
+      logger.error({ 
+        error: error.message, 
+        stack: error.stack,
+        fileName: fileNamePng,
+        level,
+        bucket: LIV_IMAGES_BUCKET_NAME 
+      }, 'Failed to generate signed URL for Liv image');
+      res.status(500).json({ error: 'Failed to generate image URL', details: error.message });
+    }
+  } catch (error) {
+    logger.error({ error }, 'Failed to process image request');
+    res.status(500).json({ error: 'Failed to process request' });
   }
 });
 
@@ -482,12 +631,20 @@ async function start() {
       logger.info('Vite dev server should be running on port 5173');
       logger.info('Run "npm run start:dev" to start both servers');
       logger.info('Using local files: scores.json and games.json');
+      if (livImagesBucket) {
+        logger.info({ bucket: LIV_IMAGES_BUCKET_NAME }, '✓ Using Cloud Storage for Liv images');
+      } else {
+        logger.warn({ bucket: LIV_IMAGES_BUCKET_NAME }, '✗ Cloud Storage NOT available for Liv images');
+      }
     } else {
       logger.info('=== PRODUCTION MODE ===');
       if (useCloudStorage) {
         logger.info({ bucket: SCORES_BUCKET_NAME }, 'Using Cloud Storage bucket for scores');
       } else {
         logger.info('Using local filesystem for scores');
+      }
+      if (livImagesBucket) {
+        logger.info({ bucket: LIV_IMAGES_BUCKET_NAME }, 'Using Cloud Storage for Liv images');
       }
       logger.info('Games loaded from games.json (Docker image) with activations from Cloud Storage');
     }

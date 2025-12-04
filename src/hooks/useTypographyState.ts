@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { TYPOGRAPHY_CONSTANTS } from '../constants/typographyConstants';
+import { getApiHeaders } from '../config/apiConfig';
 
 export function useTypographyState() {
   const [score, setScore] = useState(0);
@@ -33,9 +34,7 @@ export function useTypographyState() {
       try {
         await fetch('/api/scores/typography', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: getApiHeaders(),
           body: JSON.stringify({
             username,
             flakes: finalScore,

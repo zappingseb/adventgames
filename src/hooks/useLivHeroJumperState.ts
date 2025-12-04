@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { getApiHeaders } from '../config/apiConfig';
 
 export function useLivHeroJumperState() {
   const [score, setScore] = useState(0);
@@ -40,7 +41,7 @@ export function useLivHeroJumperState() {
       }
       return nextLevel;
     });
-    setLives(3); // Reset lives for new level
+    // Lives persist across levels - don't reset them
     // Score continues - don't reset it
     setGameActive(true);
   }, []);
@@ -55,9 +56,7 @@ export function useLivHeroJumperState() {
       try {
         await fetch('/api/scores/livherojumper', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: getApiHeaders(),
           body: JSON.stringify({
             username,
             flakes: finalScore,

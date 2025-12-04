@@ -1,3 +1,5 @@
+import { getApiHeaders } from '../config/apiConfig';
+
 export interface Game {
   code: string;
   name: string;
@@ -9,7 +11,9 @@ export interface Game {
 
 export async function getGames(): Promise<Game[]> {
   try {
-    const response = await fetch('/api/games');
+    const response = await fetch('/api/games', {
+      headers: getApiHeaders(),
+    });
     if (!response.ok) {
       throw new Error(`Failed to fetch games: ${response.statusText}`);
     }
@@ -24,9 +28,7 @@ export async function activateGame(code: string): Promise<Game> {
   try {
     const response = await fetch('/api/games/activate', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getApiHeaders(),
       body: JSON.stringify({ code }),
     });
     

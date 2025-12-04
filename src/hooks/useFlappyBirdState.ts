@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { getApiHeaders } from '../config/apiConfig';
 
 export function useFlappyBirdState() {
   const [score, setScore] = useState(0);
@@ -20,9 +21,7 @@ export function useFlappyBirdState() {
       try {
         await fetch('/api/scores/flappybird', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: getApiHeaders(),
           body: JSON.stringify({
             username,
             flakes: finalScore,

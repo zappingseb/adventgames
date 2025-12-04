@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { DESIGNERS, PER_LEVEL_INCREASE } from '../constants/designerClickerConstants';
+import { getApiHeaders } from '../config/apiConfig';
 
 export interface DesignerClickerState {
   inspiration: number;
@@ -156,9 +157,7 @@ export function useDesignerClickerState() {
       try {
         await fetch('/api/scores/designerclicker', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: getApiHeaders(),
           body: JSON.stringify({
             username,
             flakes: Math.floor(score),

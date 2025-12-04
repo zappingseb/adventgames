@@ -48,7 +48,10 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t $IMAGE_NAME:$GITHUB_SHA -t $IMAGE_NAME:latest .
+          docker build \
+            --build-arg VITE_API_KEY="${{ secrets.API_KEY }}" \
+            -t $IMAGE_NAME:$GITHUB_SHA \
+            -t $IMAGE_NAME:latest .
 
       - name: Push Docker image to Artifact Registry
         run: |
@@ -70,7 +73,8 @@ jobs:
             --port 3000 \
             --set-env-vars NODE_ENV=production \
             --set-env-vars GCP_PROJECT=${{ secrets.GCP_PROJECT_ID }} \
-            --set-env-vars SCORES_BUCKET_NAME=${{ secrets.SCORES_BUCKET_NAME || 'adventgames-scores' }}
+            --set-env-vars SCORES_BUCKET_NAME=${{ secrets.SCORES_BUCKET_NAME || 'adventgames-scores' }} \
+            --set-env-vars API_KEY="${{ secrets.API_KEY }}"
 
       - name: Get service URL
         run: |

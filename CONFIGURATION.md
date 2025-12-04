@@ -163,6 +163,56 @@ You can still use `games.json` locally for development, but remember:
 - The `activated` field in local `games.json` will be overridden by environment variables if they exist
 - For production, always use GitHub Secrets + Cloud Run env vars
 
+## API Key Security
+
+The backend API is protected with an API key to prevent unauthorized access. The same key must be embedded in the frontend build and configured on the backend.
+
+### Setup
+
+1. **Generate an API key** (use a strong random string):
+   ```bash
+   # Example: Generate a random 32-character key
+   openssl rand -hex 16
+   ```
+
+2. **Set the API key for the backend**:
+   - **Development**: Set `API_KEY` environment variable (or use default `dev-api-key-12345`)
+   - **Production (Cloud Run)**: Add as environment variable `API_KEY` in Cloud Run settings
+
+3. **Set the API key for the frontend build**:
+   - **Development**: No key needed (uses empty string, backend allows it in dev mode)
+   - **Production**: Set `VITE_API_KEY` environment variable during build:
+     ```bash
+     VITE_API_KEY=your-api-key-here npm run build
+     ```
+   - **GitHub Actions**: Add `VITE_API_KEY` as a GitHub Secret and use it in the build step:
+     ```yaml
+     - name: Build
+       env:
+         VITE_API_KEY: ${{ secrets.API_KEY }}
+       run: npm run build
+     ```
+
+### How it works
+
+- The API key is embedded in the frontend JavaScript bundle at build time
+- All API requests include the key in the `X-API-Key` header
+- The backend validates the key on all `/api/*` routes
+- In development mode, validation is skipped if no key is set (for easier local development)
+
+### Security Notes
+
+⚠️ **Important**: Embedding the API key in frontend code is not 100% secure since anyone can view the source code. However, it provides:
+- Protection against casual abuse and scraping
+- A barrier for automated bots
+- Can be combined with rate limiting and other security measures
+
+For stronger security, consider:
+- Rate limiting on the backend
+- CORS restrictions
+- IP whitelisting (if applicable)
+- Additional authentication layers
+
 ## Troubleshooting
 
 ### Scores not persisting
@@ -183,4 +233,11 @@ You can still use `games.json` locally for development, but remember:
 - Verify the environment variable format: `GAME_<CODE>_ACTIVATED=true`
 - Check that the code matches exactly (case-sensitive)
 - Restart the Cloud Run service after changing env vars
+
+### API requests failing with 401/403
+
+- Verify `API_KEY` is set in backend environment
+- Verify `VITE_API_KEY` was set during frontend build
+- Check that the same key is used in both frontend and backend
+- In development, ensure backend allows requests without key (or set `API_KEY=dev-api-key-12345`)
 

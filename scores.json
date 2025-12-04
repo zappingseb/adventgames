@@ -86,5 +86,84 @@
       "flakes": 2,
       "timestamp": "2025-11-22T20:52:38.854Z"
     }
+  ],
+  "designerclicker": [
+    {
+      "username": "Sebastian",
+      "flakes": 51829,
+      "timestamp": "2025-11-24T21:17:02.308Z"
+    }
+  ],
+  "livherojumper": [
+    {
+      "username": "Sebastian",
+      "flakes": 5603,
+      "timestamp": "2025-12-04T14:32:43.156Z"
+    },
+    {
+      "username": "TestUser",
+      "flakes": 1028,
+      "timestamp": "2025-12-01T12:47:21.714Z"
+    },
+    {
+      "username": "TestUser",
+      "flakes": 649,
+      "timestamp": "2025-12-01T12:40:55.271Z"
+    },
+    {
+      "username": "TestUser",
+      "flakes": 649,
+      "timestamp": "2025-12-01T12:41:32.058Z"
+    },
+    {
+      "username": "Sebastian",
+      "flakes": 378,
+      "timestamp": "2025-12-04T13:58:06.319Z"
+    },
+    {
+      "username": "Sebastian",
+      "flakes": 258,
+      "timestamp": "2025-12-04T13:59:34.920Z"
+    },
+    {
+      "username": "TestUser",
+      "flakes": 164,
+      "timestamp": "2025-12-01T11:30:52.898Z"
+    },
+    {
+      "username": "TestUser",
+      "flakes": 137,
+      "timestamp": "2025-12-01T11:26:58.232Z"
+    },
+    {
+      "username": "TestUser",
+      "flakes": 137,
+      "timestamp": "2025-12-01T11:27:18.552Z"
+    },
+    {
+      "username": "TestUser",
+      "flakes": 125,
+      "timestamp": "2025-12-01T11:29:47.516Z"
+    },
+    {
+      "username": "TestUser",
+      "flakes": 116,
+      "timestamp": "2025-12-01T11:29:06.694Z"
+    },
+    {
+      "username": "TestUser",
+      "flakes": 116,
+      "timestamp": "2025-12-01T11:29:36.634Z"
+    },
+    {
+      "username": "TestUser",
+      "flakes": 106,
+      "timestamp": "2025-12-01T11:30:00.684Z"
+    },
+    {
+      "username": "TestUser",
+      "flakes": 86,
+      "timestamp": "2025-12-01T11:29:26.140Z"
+    }
   ]
 }

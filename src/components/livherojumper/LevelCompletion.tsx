@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { getApiHeaders } from '../../config/apiConfig';
 import './LevelCompletion.css';
 
 interface LevelCompletionProps {
@@ -26,7 +27,9 @@ function LevelCompletion({ level, onNextLevel }: LevelCompletionProps) {
           const delay = 500 * Math.pow(2, attempt);
           await new Promise(resolve => setTimeout(resolve, delay));
           
-          const response = await fetch(`/api/images/liv/${levelStr}`);
+          const response = await fetch(`/api/images/liv/${levelStr}`, {
+            headers: getApiHeaders(),
+          });
           if (response.ok) {
             const data = await response.json();
             if (data.url) {
