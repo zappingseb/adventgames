@@ -46,7 +46,6 @@ const GAMES_ACTIVATION_FILE_NAME = 'games-activation.json';
 // Initialize Cloud Storage (called during startup)
 async function initCloudStorage() {
   let keyFilePath = null;
-  let storageForImages = null;
   
   // For images: always try to use Cloud Storage if key file exists (even in dev)
   // For scores/activations: only in production
@@ -66,15 +65,43 @@ async function initCloudStorage() {
   
   try {
     // Initialize storage for images (always if key file exists)
-    if (keyFilePath && useCloudStorageForImages) {
-      await fs.access(keyFilePath);
-      const keyFileContents = await fs.readFile(keyFilePath, 'utf8');
-      const keyData = JSON.parse(keyFileContents);
-      serviceAccountEmail = keyData.client_email || null;
-      storageForImages = new Storage({ keyFilename: keyFilePath });
-      logger.info({ keyFilePath, serviceAccountEmail }, 'Initialized Cloud Storage for images with service account key');
-      livImagesBucket = storageForImages.bucket(LIV_IMAGES_BUCKET_NAME);
-      logger.info({ livImagesBucket: LIV_IMAGES_BUCKET_NAME }, 'Initialized Liv images bucket');
+    if (useCloudStorageForImages) {
+      if (keyFilePath) {
+        try {
+          await fs.access(keyFilePath);
+          const keyFileContents = await fs.readFile(keyFilePath, 'utf8');
+          const keyData = JSON.parse(keyFileContents);
+          serviceAccountEmail = keyData.client_email || null;
+          storageForImages = new Storage({ keyFilename: keyFilePath });
+          logger.info({ keyFilePath, serviceAccountEmail }, 'Initialized Cloud Storage for images with service account key');
+        } catch (keyError) {
+          logger.warn({ keyFilePath, error: keyError.message }, 'Failed to use key file, trying Application Default Credentials');
+          // Fallback to Application Default Credentials (works in Cloud Run)
+          storageForImages = new Storage();
+          logger.info('Initialized Cloud Storage for images with Application Default Credentials');
+        }
+      } else {
+        // No key file, use Application Default Credentials (works in Cloud Run)
+        storageForImages = new Storage();
+        logger.info('Initialized Cloud Storage for images with Application Default Credentials');
+      }
+      
+      if (storageForImages) {
+        livImagesBucket = storageForImages.bucket(LIV_IMAGES_BUCKET_NAME);
+        // Verify bucket is accessible
+        try {
+          const [exists] = await livImagesBucket.exists();
+          if (exists) {
+            logger.info({ bucket: LIV_IMAGES_BUCKET_NAME }, 'Liv images bucket is ready and accessible');
+          } else {
+            logger.warn({ bucket: LIV_IMAGES_BUCKET_NAME }, 'Liv images bucket does not exist');
+            livImagesBucket = null;
+          }
+        } catch (bucketError) {
+          logger.error({ bucket: LIV_IMAGES_BUCKET_NAME, error: bucketError.message }, 'Failed to verify bucket access');
+          livImagesBucket = null;
+        }
+      }
     }
     
     // Initialize storage for scores/activations (only in production)
@@ -504,16 +531,22 @@ app.get('/api/images/liv/:level', async (req, res) => {
     
     if (!livImagesBucket) {
       let keyFileExists = false;
+      let keyFilePath = null;
       try {
-        await fs.access(path.join(__dirname, 'gcloud-storage-admin-key.json'));
+        keyFilePath = !isDev ? '/app/gcloud-storage-admin-key.json' : path.join(__dirname, 'gcloud-storage-admin-key.json');
+        await fs.access(keyFilePath);
         keyFileExists = true;
       } catch (e) {
         keyFileExists = false;
       }
       logger.warn({ 
         bucket: LIV_IMAGES_BUCKET_NAME, 
-        storageExists: !!storage,
-        keyFileExists
+        storageForImagesExists: !!storageForImages,
+        livImagesBucketExists: !!livImagesBucket,
+        keyFileExists,
+        keyFilePath,
+        isDev,
+        useCloudStorageForImages
       }, 'Liv images bucket not initialized');
       return res.status(503).json({ error: 'Image storage not available' });
     }
