@@ -6,7 +6,11 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 # Accept API key as build argument
+# Note: This is necessary for embedding the API key in the frontend bundle at build time.
+# The key is embedded in the JavaScript bundle and is not a runtime secret.
+# hadolint ignore=DL3009
 ARG VITE_API_KEY
+# hadolint ignore=DL3009
 ENV VITE_API_KEY=$VITE_API_KEY
 
 # Copy package files first for better layer caching
