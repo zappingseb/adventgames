@@ -8,9 +8,9 @@ WORKDIR /app
 # Accept API key as build argument
 # Note: This is necessary for embedding the API key in the frontend bundle at build time.
 # The key is embedded in the JavaScript bundle and is not a runtime secret.
-# hadolint ignore=DL3009
+# Security scanner warnings about ARG/ENV with secrets are expected here since
+# the key must be available at build time to be embedded in the frontend code.
 ARG VITE_API_KEY
-# hadolint ignore=DL3009
 ENV VITE_API_KEY=$VITE_API_KEY
 
 # Copy package files first for better layer caching
