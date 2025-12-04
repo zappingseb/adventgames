@@ -46,8 +46,8 @@ jobs:
           echo "${{ secrets.GCP_STORAGE_ADMIN_KEY }}" > gcloud-storage-admin-key.json
           # Remove any trailing newline that echo might add
           truncate -s -1 gcloud-storage-admin-key.json 2>/dev/null || true
-          # Verify the JSON is valid
-          python3 -c "import json; json.load(open('gcloud-storage-admin-key.json'))" || (echo "Invalid JSON. First 200 chars:" && head -c 200 gcloud-storage-admin-key.json && exit 1)
+          # Verify the JSON is valid and show better error output
+          python3 -c "import json; json.load(open('gcloud-storage-admin-key.json'))" || (echo "=== JSON Validation Failed ===" && echo "File size: $(wc -c < gcloud-storage-admin-key.json) bytes" && echo "First 500 chars (hexdump):" && head -c 500 gcloud-storage-admin-key.json | od -c | head -20 && echo "First 500 chars (text):" && head -c 500 gcloud-storage-admin-key.json && exit 1)
 
       - name: Write games.json from secret
         run: |
