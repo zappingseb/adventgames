@@ -67,23 +67,26 @@ async function initCloudStorage() {
     // Initialize storage for images (always if key file exists)
     if (useCloudStorageForImages) {
       if (keyFilePath) {
-        try {
-          await fs.access(keyFilePath);
-          const keyFileContents = await fs.readFile(keyFilePath, 'utf8');
-          const keyData = JSON.parse(keyFileContents);
-          serviceAccountEmail = keyData.client_email || null;
-          storageForImages = new Storage({ keyFilename: keyFilePath });
-          logger.info({ keyFilePath, serviceAccountEmail }, 'Initialized Cloud Storage for images with service account key');
-        } catch (keyError) {
-          logger.warn({ keyFilePath, error: keyError.message }, 'Failed to use key file, trying Application Default Credentials');
-          // Fallback to Application Default Credentials (works in Cloud Run)
-          storageForImages = new Storage();
-          logger.info('Initialized Cloud Storage for images with Application Default Credentials');
-        }
+        // In production, the key file MUST exist (it's written by GitHub Actions)
+        // Fail hard if it doesn't exist rather than falling back to ADC
+        await fs.access(keyFilePath);
+        const keyFileContents = await fs.readFile(keyFilePath, 'utf8');
+        const keyData = JSON.parse(keyFileContents);
+        serviceAccountEmail = keyData.client_email || null;
+        
+        // Use keyFilename to ensure the private key is used directly
+        // This should work the same locally and in Cloud Run
+        storageForImages = new Storage({ keyFilename: keyFilePath });
+        logger.info({ 
+          keyFilePath, 
+          serviceAccountEmail,
+          hasPrivateKey: !!keyData.private_key,
+          note: 'Using service account key file - private key will be used directly for signing'
+        }, 'Initialized Cloud Storage for images with service account key');
       } else {
-        // No key file, use Application Default Credentials (works in Cloud Run)
-        storageForImages = new Storage();
-        logger.info('Initialized Cloud Storage for images with Application Default Credentials');
+        // No key file path - this shouldn't happen in production
+        logger.error('No key file path configured for images storage');
+        throw new Error('Key file path not configured for images storage');
       }
       
       if (storageForImages) {
@@ -569,14 +572,47 @@ app.get('/api/images/liv/:level', async (req, res) => {
         return res.status(404).json({ error: 'Image not found' });
       }
       
-      // Generate signed URL that expires in 1 hour
-      const [url] = await file.getSignedUrl({
-        action: 'read',
-        expires: Date.now() + 3600000, // 1 hour
-      });
-      
-      logger.info({ fileName, level, bucket: LIV_IMAGES_BUCKET_NAME }, 'Generated signed URL for Liv image');
-      res.json({ url });
+      // Try to generate signed URL
+      // If this fails due to permissions, we'll serve the image directly
+      try {
+        // Log which authentication method is being used
+        logger.debug({ 
+          serviceAccount: serviceAccountEmail,
+          usingKeyFile: !!storageForImages?.authClient?.keyFilename,
+          isDev 
+        }, 'Attempting to generate signed URL');
+        
+        const [url] = await file.getSignedUrl({
+          action: 'read',
+          expires: Date.now() + 3600000, // 1 hour
+        });
+        
+        logger.info({ fileName, level, bucket: LIV_IMAGES_BUCKET_NAME }, 'Generated signed URL for Liv image');
+        return res.json({ url });
+      } catch (signError) {
+        // If signed URL generation fails (e.g., missing iam.serviceAccounts.signBlob permission),
+        // return a data URL (base64 encoded image) that the frontend can use directly
+        if (signError.message && signError.message.includes('signBlob')) {
+          logger.warn({ 
+            fileName, 
+            level, 
+            error: signError.message,
+            serviceAccount: serviceAccountEmail,
+            usingKeyFile: !!storageForImages?.authClient?.keyFilename,
+            note: 'Signed URL generation failed, returning base64 data URL instead'
+          }, 'Signed URL generation failed, using base64 fallback.');
+          
+          // Download the file and convert to base64 data URL
+          const [fileContents] = await file.download();
+          const contentType = fileName.endsWith('.png') ? 'image/png' : 'image/jpeg';
+          const base64 = fileContents.toString('base64');
+          const dataUrl = `data:${contentType};base64,${base64}`;
+          
+          return res.json({ url: dataUrl });
+        }
+        // Re-throw if it's a different error
+        throw signError;
+      }
     } catch (error) {
       logger.error({ 
         error: error.message, 
