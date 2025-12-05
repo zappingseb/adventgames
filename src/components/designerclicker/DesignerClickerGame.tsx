@@ -24,6 +24,7 @@ function DesignerClickerGame({ onBack }: DesignerClickerGameProps) {
     saveScore,
     endGame,
     restartGame,
+    isPurchaseOnCooldown,
   } = useDesignerClickerState();
 
   const [clickAnimation, setClickAnimation] = useState<{ x: number; y: number; id: number }[]>([]);
@@ -163,7 +164,12 @@ function DesignerClickerGame({ onBack }: DesignerClickerGameProps) {
         <div className="stats">
           <div className="stat">
             <span className="stat-label">Inspiration:</span>
-            <span className="stat-value">{displayedInspiration.toLocaleString()}</span>
+            <span className="stat-value">
+              {displayedInspiration.toLocaleString()}
+              {passiveRate > 0 && (
+                <span className="passive-rate-inline"> ({passiveRate.toFixed(1)} IP/s)</span>
+              )}
+            </span>
           </div>
           <div className="stat">
             <span className="stat-label">Level {level}:</span>
@@ -237,12 +243,6 @@ function DesignerClickerGame({ onBack }: DesignerClickerGameProps) {
             </button>
           )}
         </div>
-
-        {passiveRate > 0 && (
-          <div className="passive-rate">
-            Generating {passiveRate.toFixed(1)} IP/s
-          </div>
-        )}
       </div>
 
       <DesignerList
@@ -253,6 +253,7 @@ function DesignerClickerGame({ onBack }: DesignerClickerGameProps) {
         selectedDesigner={selectedDesigner}
         onDesignerClick={handleDesignerClick}
         onPurchase={purchaseDesigner}
+        isPurchaseOnCooldown={isPurchaseOnCooldown}
       />
     </div>
   );

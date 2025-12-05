@@ -2,8 +2,11 @@
   width: 100%;
   min-height: 100vh;
   min-height: -webkit-fill-available; /* iOS Safari fix */
-  overflow-y: auto;
+  height: auto; /* Allow page to grow with content */
+  overflow-x: hidden;
+  overflow-y: visible !important; /* Don't create scroll context - let body/html handle scrolling */
   -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
   touch-action: pan-y; /* Allow vertical scrolling */
+  position: relative;
 }
 

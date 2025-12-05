@@ -20,6 +20,7 @@ export function useDesignerClickerState() {
   const [passiveRate, setPassiveRate] = useState(0);
   const [gameOver, setGameOver] = useState(false);
   const [finalScore, setFinalScore] = useState(0);
+  const [lastPurchaseTime, setLastPurchaseTime] = useState<{ [key: string]: number }>({});
   const lastUpdateRef = useRef<number>(Date.now());
   const lastPurchaseRef = useRef<{ [key: string]: number }>({});
 
@@ -105,6 +106,7 @@ export function useDesignerClickerState() {
     
     // Record this purchase attempt
     lastPurchaseRef.current[designerId] = now;
+    setLastPurchaseTime((prev) => ({ ...prev, [designerId]: now }));
     
     // Check purchase limit
     const designer = DESIGNERS.find(d => d.id === designerId);
@@ -185,9 +187,17 @@ export function useDesignerClickerState() {
     setClickPower(1);
     setGameOver(false);
     setFinalScore(0);
+    setLastPurchaseTime({});
     lastUpdateRef.current = Date.now();
     lastPurchaseRef.current = {};
   }, []);
+
+  // Check if a purchase is on cooldown
+  const isPurchaseOnCooldown = useCallback((designerId: string): boolean => {
+    const lastPurchase = lastPurchaseTime[designerId] || 0;
+    const now = Date.now();
+    return now - lastPurchase < 1500;
+  }, [lastPurchaseTime]);
 
   return {
     inspiration,
@@ -203,6 +213,7 @@ export function useDesignerClickerState() {
     endGame,
     restartGame,
     setInspiration,
+    isPurchaseOnCooldown,
   };
 }
 

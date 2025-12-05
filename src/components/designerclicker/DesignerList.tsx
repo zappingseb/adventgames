@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { Designer } from '../../constants/designerClickerConstants';
 import { getDesignerCost, getDesignerRate } from '../../constants/designerClickerConstants';
 
@@ -9,6 +10,7 @@ interface DesignerListProps {
   selectedDesigner: string | null;
   onDesignerClick: (e: React.MouseEvent, designerId: string) => void;
   onPurchase: (designerId: string, cost: number) => void;
+  isPurchaseOnCooldown: (designerId: string) => boolean;
 }
 
 function DesignerList({
@@ -19,7 +21,23 @@ function DesignerList({
   selectedDesigner,
   onDesignerClick,
   onPurchase,
+  isPurchaseOnCooldown,
 }: DesignerListProps) {
+  // Force re-render every 100ms to update button disabled state during cooldown
+  const [, setTick] = useState(0);
+  
+  useEffect(() => {
+    const interval = setInterval(() => {
+      // Check if any designer is on cooldown
+      const anyOnCooldown = designers.some(designer => isPurchaseOnCooldown(designer.id));
+      if (anyOnCooldown) {
+        setTick(prev => prev + 1);
+      }
+    }, 100);
+    
+    return () => clearInterval(interval);
+  }, [designers, isPurchaseOnCooldown]);
+
   return (
     <div className="upgrades-sidebar" id="onboarding-target-sidebar">
       {designers.map((designer) => {
@@ -92,10 +110,13 @@ function DesignerList({
                   <button 
                     className="designer-purchase-btn"
                     type="button"
+                    disabled={isPurchaseOnCooldown(designer.id)}
                     onClick={(e) => {
                       e.stopPropagation();
                       e.preventDefault();
-                      onPurchase(designer.id, cost);
+                      if (!isPurchaseOnCooldown(designer.id)) {
+                        onPurchase(designer.id, cost);
+                      }
                     }}
                   >
                     Buy Now

@@ -58,7 +58,7 @@ export const LEVELS: Level[] = [
   },
   {
     id: 5,
-    name: 'Buildings',
+    name: 'Buildings (END)',
     description: 'Everything is concrete and too expensive.',
     milestone: 50000,
     theme: 'architecture',
