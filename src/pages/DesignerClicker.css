@@ -2,11 +2,20 @@
   width: 100%;
   min-height: 100vh;
   min-height: -webkit-fill-available; /* iOS Safari fix */
-  height: auto; /* Allow page to grow with content */
+  height: 100%; /* Fill parent height */
   overflow-x: hidden;
   overflow-y: visible !important; /* Don't create scroll context - let body/html handle scrolling */
   -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
   touch-action: pan-y; /* Allow vertical scrolling */
   position: relative;
+  box-sizing: border-box; /* Include padding in height calculation */
+}
+
+/* Ensure page container fills viewport when showing GameOver */
+.designer-clicker-page:has(.designer-clicker-game-gameover) {
+  height: 100vh !important;
+  height: -webkit-fill-available !important; /* iOS Safari fix */
+  min-height: 100vh !important;
+  min-height: -webkit-fill-available !important; /* iOS Safari fix */
 }
 

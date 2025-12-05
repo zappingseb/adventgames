@@ -144,12 +144,14 @@ function DesignerClickerGame({ onBack }: DesignerClickerGameProps) {
 
   if (gameOver) {
     return (
-      <GameOver
-        finalScore={Math.floor(finalScore)}
-        onRestart={restartGame}
-        mode="gameOver"
-        gameName="designerclicker"
-      />
+      <div className={`designer-clicker-game designer-clicker-game-gameover theme-${currentLevel.theme}`}>
+        <GameOver
+          finalScore={Math.floor(finalScore)}
+          onRestart={restartGame}
+          mode="gameOver"
+          gameName="designerclicker"
+        />
+      </div>
     );
   }
 

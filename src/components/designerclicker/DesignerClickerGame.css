@@ -1,7 +1,6 @@
 .designer-clicker-game {
   min-height: 100vh;
   min-height: -webkit-fill-available; /* iOS Safari fix */
-  height: auto; /* Allow game container to grow with content */
   padding: 20px;
   padding-bottom: 60px; /* Extra padding to ensure EndGame button is accessible (increased for Safari chrome) */
   transition: background 0.5s ease;
@@ -14,6 +13,20 @@
   -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
   /* Ensure the container doesn't block scrolling on mobile */
   -webkit-touch-callout: none; /* Prevent long-press menu on iOS */
+  box-sizing: border-box; /* Include padding in height calculation */
+}
+
+/* Ensure game container maintains full height when showing GameOver */
+.designer-clicker-game-gameover {
+  min-height: 100vh !important;
+  min-height: -webkit-fill-available !important; /* iOS Safari fix */
+  height: 100vh !important;
+  height: -webkit-fill-available !important; /* iOS Safari fix */
+  padding: 0 !important; /* Remove padding when showing GameOver */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
 }
 
 /* Theme Styles */
@@ -482,6 +495,8 @@
   /* Ensure scrolling works on mobile devices */
   /* Account for Safari browser chrome (bottom nav bar ~44-50px) */
   .designer-clicker-game {
+    min-height: 100vh !important; /* Ensure minimum viewport height */
+    min-height: -webkit-fill-available !important; /* iOS Safari fix */
     padding-bottom: 150px; /* Extra padding on mobile for EndGame button and Safari browser chrome */
     overflow-y: visible !important; /* Don't create scroll context - let parent handle scrolling */
     touch-action: pan-y; /* Allow vertical scrolling gestures to pass through */
@@ -502,6 +517,8 @@
 /* Safari's bottom navigation bar reduces visible viewport by ~44-50px */
 @media (max-width: 390px) and (max-height: 844px) {
   .designer-clicker-game {
+    min-height: 100vh !important; /* Ensure minimum viewport height */
+    min-height: -webkit-fill-available !important; /* iOS Safari fix */
     padding-bottom: 180px; /* Even more padding for smaller viewports with Safari browser chrome */
     overflow-y: visible !important; /* Don't create scroll context - let parent handle scrolling */
     touch-action: pan-y; /* Allow vertical scrolling gestures to pass through */
@@ -528,7 +545,9 @@
   
   /* Ensure game container doesn't block scrolling */
   .designer-clicker-game {
-    overflow-y: visible !important;
+    min-height: 100vh !important; /* Ensure minimum viewport height */
+    min-height: -webkit-fill-available !important; /* iOS Safari fix */
+    overflow-y: visible !important; /* Don't create scroll context - let parent handle scrolling */
     touch-action: pan-y pan-x pinch-zoom !important; /* Allow scrolling gestures to pass through */
     pointer-events: auto; /* Allow interactions but don't block scrolling */
   }

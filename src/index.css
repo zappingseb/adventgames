@@ -16,7 +16,9 @@ html {
     -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
     width: 100%;
     max-width: 100%;
-    height: auto; /* Allow html to grow with content */
+    height: 100%; /* Fill viewport height */
+    min-height: 100vh;
+    min-height: -webkit-fill-available; /* iOS Safari fix */
 }
 
 body {
@@ -24,7 +26,7 @@ body {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
     min-height: -webkit-fill-available; /* iOS Safari fix */
-    height: auto; /* Allow body to grow with content */
+    height: 100%; /* Fill parent height */
     overflow-x: hidden;
     overflow-y: auto; /* Allow vertical scrolling */
     user-select: none;
@@ -36,7 +38,7 @@ body {
 #root {
     min-height: 100vh;
     min-height: -webkit-fill-available; /* iOS Safari fix */
-    height: auto; /* Allow root to grow with content */
+    height: 100%; /* Fill parent height */
     width: 100%;
     max-width: 100%;
     overflow-x: hidden;
