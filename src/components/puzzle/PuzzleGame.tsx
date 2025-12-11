@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { getApiHeaders } from '../../config/apiConfig';
-import { Difficulty, PUZZLE_DIFFICULTIES, getDifficultyForOrientation, PUZZLE_CONSTANTS } from '../../constants/puzzleConstants';
+import { getDifficultyForOrientation } from '../../constants/puzzleConstants';
+import { Difficulty } from './DifficultySelection';
 import { Puzzle } from './PuzzleSelection';
 import { loadPuzzleScript, initPuzzleGame, cleanupPuzzleGame } from '../../lib/puzzle/puzzleWrapper';
 import './PuzzleGame.css';
