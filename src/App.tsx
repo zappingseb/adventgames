@@ -5,6 +5,7 @@ import FlappyBirdGamePage from './pages/FlappyBirdGame';
 import TypographyGame from './pages/TypographyGame';
 import DesignerClicker from './pages/DesignerClicker';
 import LivHeroJumperGamePage from './pages/LivHeroJumperGame';
+import PuzzleGamePage from './pages/PuzzleGame';
 
 function App() {
   return (
@@ -15,6 +16,8 @@ function App() {
       <Route path="/typography" element={<TypographyGame />} />
       <Route path="/designerclicker" element={<DesignerClicker />} />
       <Route path="/livherojumper" element={<LivHeroJumperGamePage />} />
+      <Route path="/puzzle" element={<PuzzleGamePage />} />
+      <Route path="/puzzlegame" element={<PuzzleGamePage />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

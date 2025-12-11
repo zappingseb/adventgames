@@ -235,6 +235,14 @@ if (isDev) {
 // Apply API key validation to all API routes
 app.use('/api', validateApiKey);
 
+// Serve puzzle HTML (must be before static middleware) - renamed to /puzzle-debugging
+app.get('/puzzle-debugging', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/puzzle', 'puzzle.html'));
+});
+
+// Serve puzzle static files (for assets like JS, CSS)
+app.use('/puzzle', express.static(path.join(__dirname, 'public/puzzle')));
+
 // Serve static files in production
 if (!isDev) {
   app.use(express.static('dist'));
@@ -696,6 +704,191 @@ app.post('/api/games/activate', async (req, res) => {
   } catch (error) {
     logger.error({ error }, 'Failed to activate game');
     res.status(500).json({ error: 'Failed to activate game' });
+  }
+});
+
+// API: Get list of available puzzles
+app.get('/api/puzzles', async (req, res) => {
+  try {
+    if (!livImagesBucket) {
+      return res.status(503).json({ error: 'Image storage not available' });
+    }
+    
+    // List all puzzle directories in the puzzles/ folder
+    const [files] = await livImagesBucket.getFiles({ prefix: 'puzzles/' });
+    const puzzleIds = new Set();
+    
+    files.forEach(file => {
+      const match = file.name.match(/^puzzles\/([^/]+)\//);
+      if (match) {
+        puzzleIds.add(match[1]);
+      }
+    });
+    
+    const puzzles = [];
+    for (const puzzleId of puzzleIds) {
+      try {
+        // Try to read metadata.json
+        const metadataFile = livImagesBucket.file(`puzzles/${puzzleId}/metadata.json`);
+        const [exists] = await metadataFile.exists();
+        
+        if (exists) {
+          const [contents] = await metadataFile.download();
+          const metadata = JSON.parse(contents.toString());
+          puzzles.push({
+            id: puzzleId,
+            ...metadata
+          });
+        } else {
+          // If no metadata, just include the puzzle ID
+          puzzles.push({
+            id: puzzleId,
+            title: puzzleId,
+            description: ''
+          });
+        }
+      } catch (error) {
+        logger.warn({ puzzleId, error: error.message }, 'Failed to read puzzle metadata');
+        puzzles.push({
+          id: puzzleId,
+          title: puzzleId,
+          description: ''
+        });
+      }
+    }
+    
+    res.json({ puzzles });
+  } catch (error) {
+    logger.error({ error: error.message, stack: error.stack }, 'Failed to list puzzles');
+    res.status(500).json({ error: 'Failed to list puzzles', details: error.message });
+  }
+});
+
+// API: Get puzzle preview image
+app.get('/api/puzzles/:puzzleId/preview', async (req, res) => {
+  try {
+    const puzzleId = req.params.puzzleId;
+    const fileNameJpg = `puzzles/${puzzleId}/preview.jpg`;
+    const fileNamePng = `puzzles/${puzzleId}/preview.png`;
+    
+    if (!livImagesBucket) {
+      return res.status(503).json({ error: 'Image storage not available' });
+    }
+    
+    try {
+      // Try JPG first (compressed images are typically .jpg)
+      let file = livImagesBucket.file(fileNameJpg);
+      let [exists] = await file.exists();
+      let fileName = fileNameJpg;
+      
+      // If JPG doesn't exist, try PNG
+      if (!exists) {
+        file = livImagesBucket.file(fileNamePng);
+        [exists] = await file.exists();
+        fileName = fileNamePng;
+      }
+      
+      if (!exists) {
+        logger.warn({ fileName, puzzleId, bucket: LIV_IMAGES_BUCKET_NAME }, 'Puzzle preview image not found');
+        return res.status(404).json({ error: 'Preview image not found' });
+      }
+      
+      // For puzzle images, always use base64 to avoid CORS issues
+      // Images are already compressed to max 500KB, so this is feasible
+      try {
+        logger.info({ fileName, puzzleId, bucket: LIV_IMAGES_BUCKET_NAME }, 'Loading puzzle preview as base64 (CORS-safe)');
+        
+        const [fileContents] = await file.download();
+        const contentType = fileName.endsWith('.png') ? 'image/png' : 'image/jpeg';
+        const base64 = fileContents.toString('base64');
+        const dataUrl = `data:${contentType};base64,${base64}`;
+        
+        return res.json({ url: dataUrl });
+      } catch (downloadError) {
+        logger.error({ 
+          fileName, 
+          puzzleId, 
+          error: downloadError.message 
+        }, 'Failed to download puzzle preview');
+        throw downloadError;
+      }
+    } catch (error) {
+      logger.error({ 
+        error: error.message, 
+        stack: error.stack,
+        fileName: fileNamePng,
+        puzzleId,
+        bucket: LIV_IMAGES_BUCKET_NAME 
+      }, 'Failed to generate signed URL for puzzle preview');
+      res.status(500).json({ error: 'Failed to generate image URL', details: error.message });
+    }
+  } catch (error) {
+    logger.error({ error }, 'Failed to process puzzle preview request');
+    res.status(500).json({ error: 'Failed to process request' });
+  }
+});
+
+// API: Get puzzle image (full image for on-the-fly splitting)
+app.get('/api/puzzles/:puzzleId/image', async (req, res) => {
+  try {
+    const puzzleId = req.params.puzzleId;
+    const fileNameJpg = `puzzles/${puzzleId}/image.jpg`;
+    const fileNamePng = `puzzles/${puzzleId}/image.png`;
+    
+    if (!livImagesBucket) {
+      return res.status(503).json({ error: 'Image storage not available' });
+    }
+    
+    try {
+      // Try JPG first (compressed images are typically .jpg)
+      let file = livImagesBucket.file(fileNameJpg);
+      let [exists] = await file.exists();
+      let fileName = fileNameJpg;
+      
+      // If JPG doesn't exist, try PNG
+      if (!exists) {
+        file = livImagesBucket.file(fileNamePng);
+        [exists] = await file.exists();
+        fileName = fileNamePng;
+      }
+      
+      if (!exists) {
+        logger.warn({ fileName, puzzleId, bucket: LIV_IMAGES_BUCKET_NAME }, 'Puzzle image not found');
+        return res.status(404).json({ error: 'Puzzle image not found' });
+      }
+      
+      // For puzzle images, always use base64 to avoid CORS issues
+      // Images are already compressed to max 500KB, so this is feasible
+      try {
+        logger.info({ fileName, puzzleId, bucket: LIV_IMAGES_BUCKET_NAME }, 'Loading puzzle image as base64 (CORS-safe)');
+        
+        const [fileContents] = await file.download();
+        const contentType = fileName.endsWith('.png') ? 'image/png' : 'image/jpeg';
+        const base64 = fileContents.toString('base64');
+        const dataUrl = `data:${contentType};base64,${base64}`;
+        
+        return res.json({ url: dataUrl });
+      } catch (downloadError) {
+        logger.error({ 
+          fileName, 
+          puzzleId, 
+          error: downloadError.message 
+        }, 'Failed to download puzzle image');
+        throw downloadError;
+      }
+    } catch (error) {
+      logger.error({ 
+        error: error.message, 
+        stack: error.stack,
+        fileName: fileNamePng,
+        puzzleId,
+        bucket: LIV_IMAGES_BUCKET_NAME 
+      }, 'Failed to generate signed URL for puzzle image');
+      res.status(500).json({ error: 'Failed to generate image URL', details: error.message });
+    }
+  } catch (error) {
+    logger.error({ error }, 'Failed to process puzzle image request');
+    res.status(500).json({ error: 'Failed to process request' });
   }
 });
 

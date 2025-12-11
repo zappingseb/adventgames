@@ -1,0 +1,24 @@
+html, body, div, span, small, strong, fieldset, nav, section {
+  margin:0;
+  padding:0;
+  border:0;
+  outline:0;
+  font-size:100%;
+  vertical-align:baseline;
+  background:transparent;
+}
+body {
+  -webkit-text-size-adjust:none;
+  font-family:sans-serif;
+}
+small {
+  margin:0 10px 30px;
+  display:block;
+  font-size:12px;
+}
+.swipe {
+  padding-bottom:0;
+  position:relative;
+  -webkit-perspective: 1000;
+  -webkit-backface-visibility: hidden;
+}

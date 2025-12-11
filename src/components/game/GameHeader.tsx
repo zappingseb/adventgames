@@ -8,7 +8,7 @@ interface GameHeaderProps {
   groundFlakes: number;
   level: number;
   onBack: () => void;
-  gameType?: 'snowflake' | 'flappybird' | 'typography' | 'livherojumper';
+  gameType?: 'snowflake' | 'flappybird' | 'typography' | 'livherojumper' | 'puzzle';
 }
 
 function GameHeader({ score, groundFlakes, level, onBack, gameType = 'snowflake' }: GameHeaderProps) {
@@ -18,6 +18,8 @@ function GameHeader({ score, groundFlakes, level, onBack, gameType = 'snowflake'
     ? TYPOGRAPHY_CONSTANTS.MAX_MISTAKES - groundFlakes
     : gameType === 'livherojumper'
     ? 3 - groundFlakes
+    : gameType === 'puzzle'
+    ? 0 // Puzzle doesn't use lives
     : DEATH_FLAKES - groundFlakes;
   const [isFlickering, setIsFlickering] = useState(false);
   const [scoreFlickering, setScoreFlickering] = useState(false);
@@ -48,12 +50,14 @@ function GameHeader({ score, groundFlakes, level, onBack, gameType = 'snowflake'
     <div className="game-header">
       <div className="score-display">
         <span className={scoreFlickering ? 'score-flicker' : ''}>
-          {gameType === 'flappybird' || gameType === 'typography' || gameType === 'livherojumper' ? 'Score' : 'Flakes'}: <span>{score}</span>
+          {gameType === 'flappybird' || gameType === 'typography' || gameType === 'livherojumper' || gameType === 'puzzle' ? 'Score' : 'Flakes'}: <span>{score}</span>
         </span>
         {(gameType === 'snowflake' || gameType === 'typography' || gameType === 'livherojumper') && <span className="level-display">Level: {level}</span>}
-        <span className={`death-count ${isFlickering ? 'flicker' : ''}`}>
-          {gameType === 'typography' ? '❌' : '💀'} {remaining}
-        </span>
+        {gameType !== 'puzzle' && (
+          <span className={`death-count ${isFlickering ? 'flicker' : ''}`}>
+            {gameType === 'typography' ? '❌' : '💀'} {remaining}
+          </span>
+        )}
       </div>
       <a href="/" className="back-btn" onClick={(e) => {
         e.preventDefault();

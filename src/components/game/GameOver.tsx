@@ -27,6 +27,9 @@ function GameOver({ finalScore, onRestart, mode = 'gameOver', gameName = 'snowfl
     if (gameName === 'livherojumper') {
       return "Jump over gaps across three columns! Use buttons or swipe left/right to move between columns, and swipe up or press jump to jump over gaps. Complete all 10 levels!";
     }
+    if (gameName === 'puzzle') {
+      return "Solve jigsaw puzzles with your own images! Drag and drop pieces to complete the puzzle. Choose your difficulty level to get started.";
+    }
     return "";
   };
 
@@ -39,6 +42,7 @@ function GameOver({ finalScore, onRestart, mode = 'gameOver', gameName = 'snowfl
              gameName === 'typography' ? 'Typography Sorter' : 
              gameName === 'designerclicker' ? 'Designer Clicker' :
              gameName === 'livherojumper' ? 'Liv Hero Jumper' :
+             gameName === 'puzzle' ? 'Jigsaw Puzzle' :
              'Designer Snowflake Tapper'}
           </h2>
           <p className="instructions">{getInstructions()}</p>
@@ -56,6 +60,8 @@ function GameOver({ finalScore, onRestart, mode = 'gameOver', gameName = 'snowfl
               ? `You earned ${(finalScore ?? 0).toLocaleString()} Inspiration Points!`
               : gameName === 'livherojumper'
               ? `You scored ${finalScore ?? 0} points!`
+              : gameName === 'puzzle'
+              ? `You completed the puzzle with a score of ${finalScore ?? 0}!`
               : `You caught ${finalScore ?? 0} snowflakes!`}
           </p>
           

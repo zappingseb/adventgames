@@ -1,0 +1,55 @@
+.difficulty-selection {
+  padding: 20px;
+  color: white;
+  text-align: center;
+}
+
+.difficulty-selection h2 {
+  margin-bottom: 30px;
+  font-size: 24px;
+}
+
+.difficulty-buttons {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.difficulty-button {
+  flex: 1;
+  min-width: 150px;
+  padding: 30px 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 18px;
+}
+
+.difficulty-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-3px);
+}
+
+.difficulty-button.selected {
+  background: rgba(76, 175, 80, 0.3);
+  border-color: rgba(76, 175, 80, 0.6);
+}
+
+.difficulty-name {
+  font-weight: bold;
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+.difficulty-pieces {
+  font-size: 14px;
+  opacity: 0.8;
+}
+
