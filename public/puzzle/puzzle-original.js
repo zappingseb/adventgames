@@ -80,9 +80,9 @@
                     g_back_g_layer.setListening(false);
                 }
                 setTimeout(function() {
+                    // Redraw layer and hit regions after resizing to ensure touch detection works correctly
                     g_layer.draw();
                     g_layer.drawHit();
-                    console.log("REDRAW LAYER");
                 }, 200);
             }
         } catch (e) {
@@ -1014,6 +1014,17 @@
                         };
                     }
                 });
+                // Add dragend handler to group so pieceTestTarget is called when group is dragged
+                // This ensures groups can snap into place when all pieces are at their target positions
+                group.on("dragend", function() {
+                    if (g_ready && group.getDraggable()) {
+                        // Use the first piece in the group to test if all pieces are at target
+                        var firstPiece = group.getChildren()[0];
+                        if (firstPiece) {
+                            pieceTestTarget(firstPiece);
+                        }
+                    }
+                });
                 piece.moveTo(group);
                 piece2.moveTo(group);
                 piece.setDraggable(false);
@@ -1025,7 +1036,22 @@
                 l_pieceY = piece.getY();
                 piece2.getParent().setX(piece2.getParent().getX() + l_sollX - piece2.getAbsolutePosition().x);
                 piece2.getParent().setY(piece2.getParent().getY() + l_sollY - piece2.getAbsolutePosition().y);
-                piece.moveTo(piece2.getParent());
+                // Ensure the existing group has dragend handler
+                var existingGroup = piece2.getParent();
+                if (existingGroup) {
+                    // Remove any existing dragend handlers and add a new one
+                    // This ensures the group can still snap into place after adding a new piece
+                    existingGroup.off("dragend");
+                    existingGroup.on("dragend", function() {
+                        if (g_ready && existingGroup.getDraggable()) {
+                            var firstPiece = existingGroup.getChildren()[0];
+                            if (firstPiece) {
+                                pieceTestTarget(firstPiece);
+                            }
+                        }
+                    });
+                }
+                piece.moveTo(existingGroup);
                 piece.setRotationDeg(piece2.getRotationDeg());
                 l_moveX = l_pieceX - piece.getAbsolutePosition().x;
                 l_moveY = l_pieceY - piece.getAbsolutePosition().y;
@@ -1051,7 +1077,22 @@
             // Piece 1 in group
             if (piece2.getParent().attrs.name === "g_layer") {
                 // Piece 2not in group
-                piece2.moveTo(piece.getParent());
+                // Ensure the existing group has dragend handler
+                var existingGroup = piece.getParent();
+                if (existingGroup) {
+                    // Remove any existing dragend handlers and add a new one
+                    // This ensures the group can still snap into place after adding a new piece
+                    existingGroup.off("dragend");
+                    existingGroup.on("dragend", function() {
+                        if (g_ready && existingGroup.getDraggable()) {
+                            var firstPiece = existingGroup.getChildren()[0];
+                            if (firstPiece) {
+                                pieceTestTarget(firstPiece);
+                            }
+                        }
+                    });
+                }
+                piece2.moveTo(existingGroup);
                 piece2.setAbsolutePosition(l_sollX, l_sollY);
                 piece2.setRotationDeg(piece.getRotationDeg());
                 piece2.setDraggable(false);
@@ -1197,6 +1238,7 @@
         if (piece === undefined) {
             return;
         }
+        // Original logic for single pieces
         piece.setX(piece.attrs.origX);
         piece.setY(piece.attrs.origY);
         piece.setRotationDeg(0);
@@ -1245,13 +1287,53 @@
         var j;
         var l_allPieces;
         var l_move_piece;
+        var allPiecesAtTarget = false;
+        var testPiece;
+        var testPieceRotation;
+        var pieceAtTarget;
+        
         // Piece lies at the right place
         if (piece.getParent().attrs.name === "g_layer") {
             g_pieceAbsoluteRotation = piece.getRotationDeg();
+            // Check if single piece is at target
+            allPiecesAtTarget = (Math.abs(piece.getAbsolutePosition().x - piece.attrs.origX) < g_precision &&
+                                 Math.abs(piece.getAbsolutePosition().y - piece.attrs.origY) < g_precision &&
+                                 g_pieceAbsoluteRotation === 0);
         } else {
+            // For grouped pieces, check if ALL pieces in the group are at their targets
             g_pieceAbsoluteRotation = (piece.getRotationDeg() + piece.getParent().getRotationDeg()) % 360;
+            l_allPieces = piece.getParent().getChildren();
+            allPiecesAtTarget = true; // Assume true, check each piece
+            
+            // Use more lenient precision for groups to make them easier to snap
+            // Groups are harder to position exactly, so we allow 50% more tolerance
+            var groupPrecision = g_precision * 1.5;
+            // Check each piece in the group to see if all are at their target positions
+            for (j = 0; j < l_allPieces.length; j += 1) {
+                testPiece = l_allPieces[j];
+                if (testPiece.getParent().attrs.name === "g_layer") {
+                    testPieceRotation = testPiece.getRotationDeg();
+                } else {
+                    testPieceRotation = (testPiece.getRotationDeg() + testPiece.getParent().getRotationDeg()) % 360;
+                }
+                
+                // Calculate distance from target position for this piece
+                var deltaX = Math.abs(testPiece.getAbsolutePosition().x - testPiece.attrs.origX);
+                var deltaY = Math.abs(testPiece.getAbsolutePosition().y - testPiece.attrs.origY);
+                // Check if piece is within tolerance and not rotated
+                pieceAtTarget = (deltaX < groupPrecision &&
+                                 deltaY < groupPrecision &&
+                                 testPieceRotation === 0);
+                
+                // If any piece in the group is not at target, the whole group cannot snap
+                if (!pieceAtTarget) {
+                    allPiecesAtTarget = false;
+                    break; // No need to check further
+                }
+            }
         }
-        if (Math.abs(piece.getAbsolutePosition().x - piece.attrs.origX) < g_precision && Math.abs(piece.getAbsolutePosition().y - piece.attrs.origY) < g_precision && g_pieceAbsoluteRotation === 0) {
+        
+        if (allPiecesAtTarget) {
             if (piece.getParent().attrs.name === "g_layer") {
                 setPiece(piece);
             } else {
@@ -1475,6 +1557,9 @@
         });
 
         piece.on("dragend", function () {
+            // When a piece (or group) is released, check if it's at its target position
+            // For single pieces, this checks the piece itself
+            // For groups, the group's dragend handler calls pieceTestTarget
             if ((piece.getDraggable() || piece.getParent().getDraggable()) && g_ready) {
                 pieceTestTarget(piece);
             } else if (g_set === g_cols * g_rows) {
