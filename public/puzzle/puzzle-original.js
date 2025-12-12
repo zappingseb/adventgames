@@ -53,6 +53,8 @@
                 }
                 g_layer = new Kinetic.Layer({name: "g_layer"});
                 g_back_g_layer = new Kinetic.Layer({name: "g_back_g_layer"});
+                // Fix 1: Disable hit detection on background layer to prevent blocking touches
+                g_back_g_layer.setListening(false);
                 g_stage = new Kinetic.Stage({
                     container: "container",
                     width: width,
@@ -61,6 +63,8 @@
                 window.g_stage = g_stage; // Store globally for resize handling
                 g_stage.add(g_back_g_layer);
                 g_stage.add(g_layer);
+                // Fix 3: Ensure layer is listening for touch events
+                g_layer.setListening(true);
                 if (g_back_g_layer.getParent() === g_stage) {
                     g_back_g_layer.moveToBottom();
                 }
@@ -69,6 +73,17 @@
                 g_stage.setWidth(width);
                 g_stage.setHeight(height);
                 g_stage.draw();
+                // Fix 2: Force regeneration of hit regions after resizing
+                if (g_layer) {
+                    g_layer.drawHit();
+                    g_layer.setListening(true);
+                    g_back_g_layer.setListening(false);
+                }
+                setTimeout(function() {
+                    g_layer.draw();
+                    g_layer.drawHit();
+                    console.log("REDRAW LAYER");
+                }, 200);
             }
         } catch (e) {
             return false;
@@ -319,6 +334,8 @@
         if (g_back_g_layer.getParent() !== g_stage) {
             g_stage.add(g_back_g_layer);
         }
+        // Fix 1: Ensure background layer hit detection is disabled
+        g_back_g_layer.setListening(false);
         // Only move to bottom if the layer is actually a child of the stage
         if (g_back_g_layer.getParent() === g_stage) {
             g_back_g_layer.moveToBottom();
@@ -457,6 +474,8 @@
                             col: i,
                             offset: [g_width / 2 + g_width * 0.3, g_height / 2 + g_height * 0.3],
                             draggable: true,
+                            // Fix 3: Ensure piece is listening for touch events
+                            listening: true,
                             dragBoundFunc: function (pos) {
                                 var newY = pos.y;
                                 var newX = pos.x;
@@ -520,6 +539,8 @@
                     fill: "black",
                     Image: img,
                     draggable: true,
+                    // Fix 3: Ensure piece is listening for touch events
+                    listening: true,
                     dragBoundFunc: function (pos) {
                         var newY = pos.y;
                         var newX = pos.x;
@@ -543,6 +564,7 @@
                 if (n === g_rows - 1 && i === g_cols - 1) {
                     // Pieces are draggable
                 }
+                piece.setListening(true);
             }
         }());
     }
@@ -575,6 +597,10 @@
         if (g_back_g_layer.getParent() !== g_stage) {
             g_stage.add(g_back_g_layer);
         }
+        // Fix 3: Ensure layer is listening for touch events
+        g_layer.setListening(true);
+        // Fix 1: Ensure background layer hit detection is disabled
+        g_back_g_layer.setListening(false);
         g_stage.setWidth(g_canvas_width);
         g_stage.setHeight(g_canvas_height);
         g_startX = 0;
@@ -647,6 +673,12 @@
                             }
                             g_layer.draw();
                             displayPuzzle();
+                            // Fix 2: Force regeneration of hit regions after building all pieces
+                            g_layer.drawHit();
+                            // Fix 2: Call again after a timeout to ensure hit regions are ready
+                            setTimeout(function() {
+                                g_layer.drawHit();
+                            }, 300);
                         }
                     });
                 } else {
@@ -662,6 +694,12 @@
                     }
                     g_layer.draw();
                     displayPuzzle();
+                    // Fix 2: Force regeneration of hit regions after building all pieces
+                    g_layer.drawHit();
+                    // // Fix 2: Call again after a timeout to ensure hit regions are ready
+                    setTimeout(function() {
+                        g_layer.drawHit();
+                    }, 300);
                 }
             }
         });
@@ -1448,6 +1486,8 @@
         piece.on("mouseout", function () {
             document.body.style.cursor = "default";
         });
+        // Fix 3: Ensure piece is listening for touch events
+        piece.setListening(true);
         g_layer.add(piece);
         g_layer.draw();
         g_stage.draw();
