@@ -25,7 +25,7 @@ function GameOver({ finalScore, onRestart, mode = 'gameOver', gameName = 'snowfl
       return "Click to design and earn Inspiration Points! Unlock designers to help you generate more IP. Reach max level and submit your score!";
     }
     if (gameName === 'livherojumper') {
-      return "Jump over gaps across three columns! Use buttons or swipe left/right to move between columns, and swipe up or press jump to jump over gaps. Complete all 10 levels!";
+      return "Jump over gaps across three columns! Use buttons or swipe left/right to move between columns, and swipe up or press jump to jump over gaps. At each level, checkout how Liv becomes better. Complete all 10 levels!";
     }
     if (gameName === 'puzzle') {
       return "Solve jigsaw puzzles with your own images! Drag and drop pieces to complete the puzzle. Choose your difficulty level to get started.";
