@@ -6,6 +6,7 @@ import TypographyGame from './pages/TypographyGame';
 import DesignerClicker from './pages/DesignerClicker';
 import LivHeroJumperGamePage from './pages/LivHeroJumperGame';
 import PuzzleGamePage from './pages/PuzzleGame';
+import XmasGame from './pages/XmasGame';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
       <Route path="/livherojumper" element={<LivHeroJumperGamePage />} />
       <Route path="/puzzle" element={<PuzzleGamePage />} />
       <Route path="/puzzlegame" element={<PuzzleGamePage />} />
+      <Route path="/xmasgame" element={<XmasGame />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
